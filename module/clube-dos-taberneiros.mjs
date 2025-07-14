@@ -13,145 +13,40 @@ import { ClubeItemSheet } from "./sheets/item-sheet.mjs";
 /*  Inicialização do Sistema                    */
 /* -------------------------------------------- */
 
-/**
- * Hook principal de inicialização do sistema
- * Configurações fundamentais que devem ser feitas antes do Foundry estar pronto
- */
 Hooks.once('init', async function() {
-  console.log('Clube dos Taberneiros | Inicializando sistema v2.3.0...');
+  console.log('Clube dos Taberneiros | Inicializando sistema...');
 
-  try {
-    // Validar compatibilidade do Foundry
-    _validateFoundryCompatibility();
-    
-    // Configurar classes de documentos
-    _configureDocumentClasses();
-    
-    // Registrar folhas (sheets)
-    _registerSheets();
-    
-    // Registrar helpers do Handlebars
-    _registerHandlebarsHelpers();
-    
-    // Configurar API pública do sistema
-    _setupPublicAPI();
-    
-    // Configurar integrações do sistema
-    _configureSystemIntegrations();
-    
-    console.log('Clube dos Taberneiros | Sistema inicializado com sucesso!');
-  } catch (error) {
-    console.error('Clube dos Taberneiros | Erro crítico na inicialização:', error);
-    ui.notifications.error("Falha crítica na inicialização do Sistema Clube dos Taberneiros");
-  }
-});
-
-/**
- * Validar compatibilidade com a versão do Foundry
- * @private
- */
-function _validateFoundryCompatibility() {
-  const requiredVersion = 11;
-  const currentVersion = parseInt(game.version?.split('.')[0]) || 0;
-  
-  if (currentVersion < requiredVersion) {
-    throw new Error(`Foundry VTT v${requiredVersion}+ é necessário. Versão atual: v${game.version}`);
-  }
-  
-  console.log(`Clube dos Taberneiros | Foundry v${game.version} - Compatível ✓`);
-}
-
-/**
- * Configurar classes de documentos do sistema
- * @private
- */
-function _configureDocumentClasses() {
+  // Definir classes de documentos
   CONFIG.Actor.documentClass = ClubeActor;
   CONFIG.Item.documentClass = ClubeItem;
-  
-  console.log('Clube dos Taberneiros | Classes de documentos configuradas');
-}
 
-/**
- * Registrar folhas (sheets) do sistema
- * @private  
- */
-function _registerSheets() {
   // Registrar folhas de personagem
   Actors.unregisterSheet("core", ActorSheet);
   Actors.registerSheet("clube-dos-taberneiros", TaberneiroPersonagemSheet, {
     types: ["personagem"],
-    makeDefault: true,
-    label: "CDT.SheetLabels.Character"
+    makeDefault: true
   });
 
   // Registrar folhas de itens
   Items.unregisterSheet("core", ItemSheet);
   Items.registerSheet("clube-dos-taberneiros", ClubeItemSheet, {
     types: ["habilidade", "magia", "arma", "armadura", "escudo", "equipamento", "pocao"],
-    makeDefault: true,
-    label: "CDT.SheetLabels.Item"
+    makeDefault: true
   });
-  
-  console.log('Clube dos Taberneiros | Folhas registradas');
-}
 
-/**
- * Configurar API pública do sistema
- * @private
- */
-function _setupPublicAPI() {
-  // API pública disponível globalmente
+  // Registrar helpers do Handlebars
+  _registerHandlebarsHelpers();
+
+  // Configurar sistema para uso de macros
   game.cdt = {
-    // Funções de rolagem
-    rollTest,
-    rollDamage, 
-    rollSpell,
-    rollWeapon,
-    
-    // Utilitários
-    calculateXPForLevel,
-    getAttributeModifier,
-    canLevelUp,
-    levelUp,
-    
-    // Informações do sistema
-    version: "2.3.0",
-    name: "Clube dos Taberneiros"
-  };
-  
-  console.log('Clube dos Taberneiros | API pública configurada');
-}
-
-/**
- * Configurar integrações com outros sistemas do Foundry
- * @private
- */
-function _configureSystemIntegrations() {
-  // Configurar fórmula de iniciativa
-  CONFIG.Combat.initiative = {
-    formula: "2d6 + @acao.value",
-    decimals: 0
+    rollTest: rollTest,
+    rollDamage: rollDamage,
+    rollSpell: rollSpell,
+    rollWeapon: rollWeapon
   };
 
-  // Configurar atributos trackáveis em tokens
-  CONFIG.Actor.trackableAttributes = {
-    personagem: {
-      bar: ["pv", "pm"],
-      value: ["pv.value", "pm.value"]
-    },
-    npc: {
-      bar: ["pv", "pm"], 
-      value: ["pv.value", "pm.value"]
-    },
-    criatura: {
-      bar: ["pv"],
-      value: ["pv.value"]
-    }
-  };
-  
-  console.log('Clube dos Taberneiros | Integrações configuradas');
-}
+  console.log('Clube dos Taberneiros | Sistema inicializado com sucesso!');
+});
 
 /* -------------------------------------------- */
 /*  Helpers do Handlebars                       */
@@ -277,84 +172,56 @@ function _registerHandlebarsHelpers() {
 }
 
 /* -------------------------------------------- */
-/*  Hooks de Sistema Otimizados                */
+/*  Hooks de Sistema                            */
 /* -------------------------------------------- */
 
-/**
- * Hook para inicialização de novos atores
- * Executa apenas para personagens recém-criados
- * @param {Actor} actor - O ator criado
- * @param {Object} options - Opções de criação
- * @param {string} userId - ID do usuário que criou
- */
+// Hook para quando um ator é criado
 Hooks.on("createActor", (actor, options, userId) => {
-  // Só executar para o usuário que criou e apenas para personagens
-  if (userId === game.user.id && actor.type === "personagem") {
-    try {
-      const updates = _initializeCharacterValues(actor.system);
-      if (Object.keys(updates).length > 0) {
-        queueUpdate(actor, updates);
-      }
-    } catch (error) {
-      console.error("Clube dos Taberneiros | Erro na inicialização de ator:", error);
+  if (actor.type === "personagem") {
+    // Calcular valores derivados iniciais com validação
+    const updates = _initializeCharacterValues(actor.system);
+    if (Object.keys(updates).length > 0) {
+      actor.update(updates, { skipDerivedCalculation: true });
     }
   }
 });
 
 /**
  * Inicializar valores derivados para novo personagem
- * @param {Object} system - Sistema do ator
- * @returns {Object} Updates necessários
  */
 function _initializeCharacterValues(system) {
   const updates = {};
   
   try {
-    // Validar estrutura do sistema
-    if (!system || typeof system !== 'object') {
-      console.warn("Clube dos Taberneiros | Sistema inválido para inicialização");
-      return updates;
-    }
-
-    // Inicializar atributos com valores padrão e modificadores
-    const defaultAttributeValue = 4;
+    // Inicializar atributos se não definidos
     ['fisico', 'acao', 'mental', 'social'].forEach(attr => {
-      if (!system[attr] || typeof system[attr].value !== 'number') {
-        updates[`system.${attr}.value`] = defaultAttributeValue;
-        updates[`system.${attr}.mod`] = 0; // Mod para atributo 4
+      if (!system[attr] || system[attr].value === undefined) {
+        updates[`system.${attr}.value`] = 4;
       }
     });
 
-    // Calcular valores derivados baseados nos atributos
-    const fisicoValue = system.fisico?.value || defaultAttributeValue;
-    const mentalValue = system.mental?.value || defaultAttributeValue;
-    const acaoValue = system.acao?.value || defaultAttributeValue;
-    
-    // PV = Físico × 3 + 10
+    // Calcular PV máximo inicial
+    const fisicoValue = system.fisico?.value || 4;
     const pvMax = Math.max(1, fisicoValue * 3 + 10);
-    if (!system.pv || typeof system.pv.max !== 'number') {
-      updates["system.pv.max"] = pvMax;
-      updates["system.pv.value"] = pvMax;
-    }
+    updates["system.pv.max"] = pvMax;
+    updates["system.pv.value"] = pvMax;
     
-    // PM = Mental × 2 + 5
+    // Calcular PM máximo inicial
+    const mentalValue = system.mental?.value || 4;
     const pmMax = Math.max(0, mentalValue * 2 + 5);
-    if (!system.pm || typeof system.pm.max !== 'number') {
-      updates["system.pm.max"] = pmMax;
-      updates["system.pm.value"] = pmMax;
-    }
+    updates["system.pm.max"] = pmMax;
+    updates["system.pm.value"] = pmMax;
     
-    // Defesa = 10 + Ação + bônus de equipamentos
-    if (!system.defesa || typeof system.defesa.value !== 'number') {
-      updates["system.defesa.value"] = 10 + acaoValue;
-      updates["system.defesa.base"] = 10;
-      updates["system.defesa.armadura"] = 0;
-      updates["system.defesa.escudo"] = 0;
-      updates["system.defesa.outros"] = 0;
-    }
+    // Calcular Defesa inicial
+    const acaoValue = system.acao?.value || 4;
+    updates["system.defesa.value"] = 10 + acaoValue;
+    updates["system.defesa.base"] = 10;
+    updates["system.defesa.armadura"] = 0;
+    updates["system.defesa.escudo"] = 0;
+    updates["system.defesa.outros"] = 0;
 
-    // Inicializar recursos se não existirem
-    if (!system.recursos || typeof system.recursos !== 'object') {
+    // Inicializar estruturas de recursos
+    if (!system.recursos) {
       updates["system.recursos"] = {
         moedas: { cobre: 0, prata: 0, ouro: 0 },
         carga: { atual: 0, max: 40 }
@@ -362,7 +229,7 @@ function _initializeCharacterValues(system) {
     }
 
     // Inicializar progressão
-    if (!system.progressao || typeof system.progressao !== 'object') {
+    if (!system.progressao) {
       updates["system.progressao"] = {
         pontosAtributo: 0,
         pontosHabilidade: 0
@@ -370,21 +237,11 @@ function _initializeCharacterValues(system) {
     }
 
     // Inicializar nível e XP
-    if (!system.nivel || typeof system.nivel.value !== 'number') {
+    if (!system.nivel) {
       updates["system.nivel"] = {
         value: 1,
         xp: 0,
         xpProximo: 10
-      };
-    }
-    
-    // Inicializar detalhes se não existirem
-    if (!system.detalhes || typeof system.detalhes !== 'object') {
-      updates["system.detalhes"] = {
-        biografia: "",
-        aparencia: "",
-        personalidade: "",
-        historia: ""
       };
     }
 
@@ -395,302 +252,157 @@ function _initializeCharacterValues(system) {
   return updates;
 }
 
-// Hook otimizado para atualizações de ator - sem setTimeout
+// Hook simplificado para atualizações de ator
 Hooks.on("updateActor", (actor, changes, options, userId) => {
   // Só calcular valores derivados se não foi explicitamente desabilitado
-  if (actor.type === "personagem" && !options.skipDerivedCalculation && userId === game.user.id) {
-    try {
-      const updates = _calculateDerivedValues(actor.system, changes);
-      
-      if (Object.keys(updates).length > 0) {
-        // Usar queueUpdate para evitar loops infinitos
-        queueUpdate(actor, updates);
+  if (actor.type === "personagem" && !options.skipDerivedCalculation) {
+    // Usar setTimeout para evitar conflitos de timing
+    setTimeout(() => {
+      try {
+        const updates = _calculateDerivedValues(actor.system, changes);
+        
+        if (Object.keys(updates).length > 0) {
+          actor.update(updates, { skipDerivedCalculation: true });
+        }
+      } catch (error) {
+        console.error("Clube dos Taberneiros | Erro nos cálculos derivados:", error);
       }
-    } catch (error) {
-      console.error("Clube dos Taberneiros | Erro nos cálculos derivados:", error);
-    }
+    }, 50); // Timeout muito menor
   }
 });
 
-/**
- * Hook para criação de novos itens
- * Atualiza valores derivados do ator pai quando necessário
- * @param {Item} item - O item criado
- * @param {Object} options - Opções de criação
- * @param {string} userId - ID do usuário que criou
- */
+// Hooks para quando itens são adicionados/removidos - com proteção
 Hooks.on("createItem", (item, options, userId) => {
-  if (_shouldUpdateActorFromItem(item, options, userId)) {
-    queueItemUpdate(item.parent);
+  if (item.parent && item.parent.type === "personagem" && !options.skipActorUpdate) {
+    setTimeout(() => _updateActorFromItems(item.parent), 100);
   }
 });
 
-/**
- * Hook para atualização de itens existentes
- * Verifica se as mudanças afetam o ator pai
- * @param {Item} item - O item atualizado
- * @param {Object} changes - Mudanças aplicadas
- * @param {Object} options - Opções de atualização
- * @param {string} userId - ID do usuário que atualizou
- */
 Hooks.on("updateItem", (item, changes, options, userId) => {
-  if (_shouldUpdateActorFromItem(item, options, userId)) {
-    // Verificar se são mudanças que afetam o ator
-    const relevantFields = ['equipado', 'defesa', 'peso', 'quantidade', 'penalidade'];
-    const hasRelevantChanges = relevantFields.some(field => 
-      changes.system?.hasOwnProperty(field)
+  if (item.parent && item.parent.type === "personagem" && !options.skipActorUpdate) {
+    // Só atualizar se mudanças relevantes para equipamento
+    const relevantChanges = ['equipado', 'defesa', 'peso', 'quantidade'];
+    const hasRelevantChanges = relevantChanges.some(field => 
+      changes.system && changes.system.hasOwnProperty(field)
     );
     
     if (hasRelevantChanges) {
-      queueItemUpdate(item.parent);
+      setTimeout(() => _updateActorFromItems(item.parent), 100);
     }
   }
 });
 
-/**
- * Hook para deleção de itens
- * Atualiza valores derivados do ator pai
- * @param {Item} item - O item deletado
- * @param {Object} options - Opções de deleção
- * @param {string} userId - ID do usuário que deletou
- */
 Hooks.on("deleteItem", (item, options, userId) => {
-  if (_shouldUpdateActorFromItem(item, options, userId)) {
-    queueItemUpdate(item.parent);
+  if (item.parent && item.parent.type === "personagem" && !options.skipActorUpdate) {
+    setTimeout(() => _updateActorFromItems(item.parent), 100);
   }
 });
-
-/**
- * Função auxiliar para verificar se deve atualizar ator a partir de item
- * @param {Item} item - O item
- * @param {Object} options - Opções da operação
- * @param {string} userId - ID do usuário
- * @returns {boolean} Se deve atualizar o ator
- */
-function _shouldUpdateActorFromItem(item, options, userId) {
-  return item?.parent && 
-         item.parent.type === "personagem" && 
-         !options.skipActorUpdate && 
-         userId === game.user.id;
-}
-
-/* -------------------------------------------- */
-/*  Sistema de Queue para Updates               */
-/* -------------------------------------------- */
-
-// Sistema de queue para evitar loops infinitos de update
-const updateQueue = new Map();
-let queueTimer = null;
-
-/**
- * Adiciona update à queue para processamento em batch
- */
-function queueUpdate(actor, updates) {
-  if (!actor?.id) return;
-  
-  // Mesclar com updates existentes na queue
-  const existing = updateQueue.get(actor.id) || {};
-  const merged = foundry.utils.mergeObject(existing, updates);
-  updateQueue.set(actor.id, merged);
-  
-  // Processar queue no próximo tick
-  if (!queueTimer) {
-    queueTimer = requestAnimationFrame(processUpdateQueue);
-  }
-}
-
-/**
- * Processa queue de updates em batch
- */
-async function processUpdateQueue() {
-  queueTimer = null;
-  
-  for (const [actorId, updates] of updateQueue.entries()) {
-    try {
-      const actor = game.actors.get(actorId);
-      if (actor && Object.keys(updates).length > 0) {
-        await actor.update(updates, { skipDerivedCalculation: true });
-      }
-    } catch (error) {
-      console.error(`Clube dos Taberneiros | Erro ao processar update para ator ${actorId}:`, error);
-    }
-  }
-  
-  updateQueue.clear();
-}
-
-/**
- * Queue específica para updates de itens
- */
-function queueItemUpdate(actor) {
-  if (!actor?.id) return;
-  
-  // Usar debounce para agrupar múltiplas mudanças de item
-  const timerId = `item-update-${actor.id}`;
-  
-  if (updateQueue.has(timerId)) {
-    clearTimeout(updateQueue.get(timerId));
-  }
-  
-  const timer = setTimeout(() => {
-    _updateActorFromItems(actor);
-    updateQueue.delete(timerId);
-  }, 50);
-  
-  updateQueue.set(timerId, timer);
-}
 
 /* -------------------------------------------- */
 /*  Funções de Cálculo Aprimoradas              */
 /* -------------------------------------------- */
 
-/**
- * Calcular valores derivados de forma otimizada - apenas o que mudou
- * @param {Object} system - Sistema atual do ator
- * @param {Object} changes - Mudanças específicas
- * @returns {Object} Updates necessários
- */
 function _calculateDerivedValues(system, changes = {}) {
   const updates = {};
   
-  try {
-    // Validar entrada
-    if (!system || !changes.system) {
-      return updates;
-    }
+  // SER ULTRA CONSERVADOR - só atualizar o que realmente mudou
+  
+  // Recalcular PV máximo APENAS se Físico mudou especificamente
+  if (changes.system?.fisico?.value !== undefined) {
+    const fisicoValue = parseInt(changes.system.fisico.value) || 4;
+    const newPvMax = Math.max(1, fisicoValue * 3 + 10);
     
-    const systemChanges = changes.system;
-    
-    // Recalcular PV máximo APENAS se Físico mudou
-    if (systemChanges.fisico?.value !== undefined) {
-      const fisicoValue = Math.max(1, Math.min(15, parseInt(systemChanges.fisico.value) || 4));
-      const newPvMax = Math.max(1, fisicoValue * 3 + 10);
+    // Só atualizar se realmente mudou
+    if (system.pv?.max !== newPvMax) {
+      updates["system.pv.max"] = newPvMax;
       
-      if (system.pv?.max !== newPvMax) {
-        updates["system.pv.max"] = newPvMax;
-        
-        // Ajustar PV atual se ultrapassou o máximo
-        const currentPv = system.pv?.value || 0;
-        if (currentPv > newPvMax) {
-          updates["system.pv.value"] = newPvMax;
-        }
+      // Ajustar PV atual apenas se necessário
+      if (system.pv?.value > newPvMax) {
+        updates["system.pv.value"] = newPvMax;
       }
     }
+  }
+  
+  // Recalcular PM máximo APENAS se Mental mudou especificamente
+  if (changes.system?.mental?.value !== undefined) {
+    const mentalValue = parseInt(changes.system.mental.value) || 4;
+    const newPmMax = Math.max(0, mentalValue * 2 + 5);
     
-    // Recalcular PM máximo APENAS se Mental mudou
-    if (systemChanges.mental?.value !== undefined) {
-      const mentalValue = Math.max(1, Math.min(15, parseInt(systemChanges.mental.value) || 4));
-      const newPmMax = Math.max(0, mentalValue * 2 + 5);
+    // Só atualizar se realmente mudou
+    if (system.pm?.max !== newPmMax) {
+      updates["system.pm.max"] = newPmMax;
       
-      if (system.pm?.max !== newPmMax) {
-        updates["system.pm.max"] = newPmMax;
-        
-        // Ajustar PM atual se ultrapassou o máximo
-        const currentPm = system.pm?.value || 0;
-        if (currentPm > newPmMax) {
-          updates["system.pm.value"] = newPmMax;
-        }
+      // Ajustar PM atual apenas se necessário
+      if (system.pm?.value > newPmMax) {
+        updates["system.pm.value"] = newPmMax;
       }
     }
+  }
+  
+  // Recalcular Defesa APENAS se Ação mudou especificamente
+  if (changes.system?.acao?.value !== undefined) {
+    const acaoValue = parseInt(changes.system.acao.value) || 4;
+    const armaduraBonus = system.defesa?.armadura || 0;
+    const escudoBonus = system.defesa?.escudo || 0;
+    const outrosBonus = system.defesa?.outros || 0;
+    const newDefesa = 10 + acaoValue + armaduraBonus + escudoBonus + outrosBonus;
     
-    // Recalcular Defesa APENAS se Ação mudou
-    if (systemChanges.acao?.value !== undefined) {
-      const acaoValue = Math.max(1, Math.min(15, parseInt(systemChanges.acao.value) || 4));
-      const defesaAtual = system.defesa || {};
-      const newDefesaTotal = 10 + acaoValue + 
-                            (defesaAtual.armadura || 0) + 
-                            (defesaAtual.escudo || 0) + 
-                            (defesaAtual.outros || 0);
-      
-      if (defesaAtual.value !== newDefesaTotal) {
-        updates["system.defesa.value"] = newDefesaTotal;
-      }
+    // Só atualizar se realmente mudou
+    if (system.defesa?.value !== newDefesa) {
+      updates["system.defesa.value"] = newDefesa;
     }
-    
-    // Calcular modificadores de atributos se algum atributo mudou
-    ['fisico', 'acao', 'mental', 'social'].forEach(attr => {
-      if (systemChanges[attr]?.value !== undefined) {
-        const value = Math.max(1, Math.min(15, parseInt(systemChanges[attr].value) || 4));
-        const mod = Math.floor((value - 4) / 2);
-        
-        if (system[attr]?.mod !== mod) {
-          updates[`system.${attr}.mod`] = mod;
-        }
-      }
-    });
-    
-  } catch (error) {
-    console.error("Clube dos Taberneiros | Erro em _calculateDerivedValues:", error);
   }
 
   return updates;
 }
 
-/**
- * Atualizar ator baseado em itens equipados - versão otimizada
- */
 function _updateActorFromItems(actor) {
   try {
-    if (!actor?.system) {
-      console.warn("Clube dos Taberneiros | Ator inválido para update de itens");
-      return;
-    }
-
     const updates = {};
     let armaduraDefesa = 0;
     let escudoDefesa = 0;
     let cargaAtual = 0;
 
-    // Calcular bônus de equipamentos de forma otimizada
-    for (const item of actor.items) {
-      const itemSystem = item.system;
-      
-      // Bônus de defesa apenas para itens equipados
-      if (itemSystem?.equipado) {
-        if (item.type === "armadura" && itemSystem.defesa) {
-          armaduraDefesa += itemSystem.defesa;
-        } else if (item.type === "escudo" && itemSystem.defesa) {
-          escudoDefesa += itemSystem.defesa;
+    // Calcular bônus de equipamentos
+    actor.items.forEach(item => {
+      if (item.system.equipado) {
+        if (item.type === "armadura") {
+          armaduraDefesa += item.system.defesa || 0;
+        } else if (item.type === "escudo") {
+          escudoDefesa += item.system.defesa || 0;
         }
       }
       
-      // Calcular carga total (independente de equipado)
-      if (itemSystem?.peso) {
-        const quantidade = itemSystem.quantidade || 1;
-        cargaAtual += itemSystem.peso * quantidade;
+      // Calcular carga total
+      if (item.system.peso) {
+        const quantidade = item.system.quantidade || 1;
+        cargaAtual += item.system.peso * quantidade;
       }
-    }
+    });
 
-    // Verificar mudanças reais antes de atualizar
-    const currentDefesa = actor.system.defesa || {};
-    const currentCarga = actor.system.recursos?.carga || {};
-    
-    if (currentDefesa.armadura !== armaduraDefesa) {
+    // Só atualizar se realmente mudou
+    if (actor.system.defesa?.armadura !== armaduraDefesa) {
       updates["system.defesa.armadura"] = armaduraDefesa;
     }
     
-    if (currentDefesa.escudo !== escudoDefesa) {
+    if (actor.system.defesa?.escudo !== escudoDefesa) {
       updates["system.defesa.escudo"] = escudoDefesa;
     }
     
-    // Recalcular defesa total
-    const acaoValue = actor.system.acao?.value || 4;
-    const outrosBonus = currentDefesa.outros || 0;
-    const newDefesaTotal = 10 + acaoValue + armaduraDefesa + escudoDefesa + outrosBonus;
-    
-    if (currentDefesa.value !== newDefesaTotal) {
-      updates["system.defesa.value"] = newDefesaTotal;
+    const newDefesa = 10 + (actor.system.acao?.value || 4) + armaduraDefesa + escudoDefesa + (actor.system.defesa?.outros || 0);
+    if (actor.system.defesa?.value !== newDefesa) {
+      updates["system.defesa.value"] = newDefesa;
     }
     
-    // Atualizar carga com precisão
-    const newCarga = Math.round(cargaAtual * 100) / 100; // Precisão de centésimos
-    if (Math.abs((currentCarga.atual || 0) - newCarga) > 0.01) {
+    // Atualizar carga apenas se mudou significativamente
+    const newCarga = Math.round(cargaAtual * 10) / 10;
+    if (Math.abs((actor.system.recursos?.carga?.atual || 0) - newCarga) > 0.1) {
       updates["system.recursos.carga.atual"] = newCarga;
     }
 
-    // Usar queue em vez de update direto
+    // Só fazer update se há mudanças reais
     if (Object.keys(updates).length > 0) {
-      queueUpdate(actor, updates);
+      actor.update(updates, { skipDerivedCalculation: true });
     }
 
   } catch (error) {
@@ -703,50 +415,21 @@ function _updateActorFromItems(actor) {
 /* -------------------------------------------- */
 
 /**
- * Função principal para testes 2d6 - versão melhorada com validação
- * @param {Object} actor - Ator fazendo o teste
- * @param {string} attribute - Nome do atributo
- * @param {number} skillBonus - Bônus de habilidade
- * @param {number} difficulty - Número de dificuldade
- * @param {Object} options - Opções adicionais
- * @returns {Promise<Object|null>} Resultado do teste ou null se erro
+ * Função principal para testes 2d6
  */
 export async function rollTest(actor, attribute, skillBonus = 0, difficulty = 9, options = {}) {
   try {
-    // Validação de entrada robusta
-    if (!actor || !actor.system) {
-      ui.notifications.error("Ator inválido para rolagem");
-      console.error("Clube dos Taberneiros | Ator inválido:", actor);
-      return null;
-    }
+    const attributeValue = actor.system[attribute]?.value || 0;
+    const total = attributeValue + skillBonus;
     
-    if (!attribute || typeof attribute !== 'string') {
-      ui.notifications.error("Atributo inválido para rolagem");
-      console.error("Clube dos Taberneiros | Atributo inválido:", attribute);
-      return null;
-    }
-    
-    if (!actor.system[attribute]) {
-      ui.notifications.error(`Atributo "${attribute}" não encontrado no personagem`);
-      console.error("Clube dos Taberneiros | Atributo não encontrado:", attribute, actor.system);
-      return null;
-    }
-    
-    // Validar e limitar valores
-    const attributeValue = Math.max(0, parseInt(actor.system[attribute]?.value) || 0);
-    const validSkillBonus = Math.max(-10, Math.min(10, parseInt(skillBonus) || 0));
-    const validDifficulty = Math.max(2, Math.min(20, parseInt(difficulty) || 9));
-    const total = attributeValue + validSkillBonus;
-    
-    // Criar e avaliar rolagem
     const rollFormula = "2d6 + @total";
     const roll = new Roll(rollFormula, { total });
     await roll.evaluate();
     
     const result = roll.total;
-    const naturalRoll = roll.dice[0]?.results?.reduce((sum, r) => sum + (r.result || 0), 0) || 0;
+    const naturalRoll = roll.dice[0].results.reduce((sum, r) => sum + r.result, 0);
     
-    // Determinar tipo de resultado com validação
+    // Determinar tipo de resultado
     let resultType = "failure";
     let resultClass = "failure";
     let resultText = "Falha";
@@ -759,16 +442,14 @@ export async function rollTest(actor, attribute, skillBonus = 0, difficulty = 9,
       resultType = "criticalFailure";
       resultClass = "critical-failure";
       resultText = "Falha Crítica";
-    } else if (result >= validDifficulty) {
+    } else if (result >= difficulty) {
       resultType = "success";
       resultClass = "success";
       resultText = "Sucesso";
     }
     
-    // Criar mensagem de chat com validação
-    const attributeDisplayName = attribute.charAt(0).toUpperCase() + attribute.slice(1);
-    const flavor = options.flavor || `Teste de ${attributeDisplayName}`;
-    
+    // Criar mensagem de chat aprimorada
+    const flavor = options.flavor || `Teste de ${attribute.charAt(0).toUpperCase() + attribute.slice(1)}`;
     const messageData = {
       speaker: ChatMessage.getSpeaker({ actor }),
       flavor: flavor,
@@ -776,20 +457,17 @@ export async function rollTest(actor, attribute, skillBonus = 0, difficulty = 9,
         <div class="cdt-roll-result ${resultClass}">
           <div class="cdt-roll-header">
             <h3>${flavor}</h3>
-            <div class="cdt-roll-formula">2d6 + ${total} (${attributeDisplayName} ${attributeValue}${validSkillBonus !== 0 ? ` ${validSkillBonus >= 0 ? '+' : ''}${validSkillBonus}` : ''})</div>
+            <div class="cdt-roll-formula">2d6 + ${total} (${attribute} ${attributeValue}${skillBonus ? ` + ${skillBonus}` : ''})</div>
           </div>
           <div class="cdt-roll-body">
             <div class="cdt-dice-result">
               <span class="cdt-dice-total">${result}</span>
               <span class="cdt-natural-roll">(${naturalRoll} + ${total})</span>
             </div>
-            <div class="cdt-difficulty">ND ${validDifficulty}</div>
+            <div class="cdt-difficulty">ND ${difficulty}</div>
             <div class="cdt-result ${resultClass}">
               <strong>${resultText}</strong>
-              ${result >= validDifficulty ? 
-                `<span class="success-margin">Margem: ${result - validDifficulty}</span>` : 
-                `<span class="failure-margin">Faltou: ${validDifficulty - result}</span>`
-              }
+              ${result >= difficulty ? `<span class="success-margin">Margem: ${result - difficulty}</span>` : `<span class="failure-margin">Faltou: ${difficulty - result}</span>`}
             </div>
           </div>
         </div>
@@ -798,75 +476,30 @@ export async function rollTest(actor, attribute, skillBonus = 0, difficulty = 9,
       type: CONST.CHAT_MESSAGE_TYPES.ROLL
     };
 
-    // Aplicar efeitos especiais para críticos com validação
-    try {
-      if (resultType === "criticalSuccess" && typeof options.onCriticalSuccess === 'function') {
-        await options.onCriticalSuccess(actor, result);
-      } else if (resultType === "criticalFailure" && typeof options.onCriticalFailure === 'function') {
-        await options.onCriticalFailure(actor, result);
-      }
-    } catch (callbackError) {
-      console.error("Clube dos Taberneiros | Erro em callback de crítico:", callbackError);
-      // Não interromper o fluxo principal por erro em callback
+    // Aplicar efeitos especiais para críticos
+    if (resultType === "criticalSuccess" && options.onCriticalSuccess) {
+      options.onCriticalSuccess(actor, result);
+    } else if (resultType === "criticalFailure" && options.onCriticalFailure) {
+      options.onCriticalFailure(actor, result);
     }
     
-    // Criar mensagem de chat
-    await ChatMessage.create(messageData);
-    
-    return { 
-      roll, 
-      result, 
-      resultType, 
-      naturalRoll, 
-      attributeValue, 
-      skillBonus: validSkillBonus, 
-      difficulty: validDifficulty 
-    };
+    ChatMessage.create(messageData);
+    return { roll, result, resultType, naturalRoll };
     
   } catch (error) {
-    console.error("Clube dos Taberneiros | Erro crítico na rolagem:", error);
-    ui.notifications.error(`Erro ao realizar rolagem: ${error.message}`);
+    console.error("Clube dos Taberneiros | Erro na rolagem:", error);
+    ui.notifications.error("Erro ao realizar rolagem");
     return null;
   }
 }
 
 /**
- * Rolagem de dano aprimorada com validação
- * @param {string} formula - Fórmula de dano (ex: "1d6+2")
- * @param {Object} actor - Ator fazendo o dano
- * @param {Object} options - Opções adicionais
- * @returns {Promise<Roll|null>} Resultado da rolagem ou null se erro
+ * Rolagem de dano aprimorada
  */
 export async function rollDamage(formula, actor, options = {}) {
   try {
-    // Validação de entrada
-    if (!formula || typeof formula !== 'string') {
-      ui.notifications.error("Fórmula de dano inválida");
-      console.error("Clube dos Taberneiros | Fórmula inválida:", formula);
-      return null;
-    }
-    
-    if (!actor || !actor.system) {
-      ui.notifications.error("Ator inválido para rolagem de dano");
-      console.error("Clube dos Taberneiros | Ator inválido:", actor);
-      return null;
-    }
-    
-    // Sanitizar fórmula básica (remover caracteres perigosos)
-    const sanitizedFormula = formula.replace(/[^0-9d+\-*/() ]/g, '');
-    if (!sanitizedFormula || sanitizedFormula.length === 0) {
-      ui.notifications.error("Fórmula de dano contém caracteres inválidos");
-      return null;
-    }
-    
-    // Criar e avaliar rolagem
-    const roll = new Roll(sanitizedFormula);
+    const roll = new Roll(formula);
     await roll.evaluate();
-    
-    // Validar resultado
-    if (!roll || typeof roll.total !== 'number') {
-      throw new Error("Resultado de rolagem inválido");
-    }
     
     const messageData = {
       speaker: ChatMessage.getSpeaker({ actor }),
@@ -878,7 +511,7 @@ export async function rollDamage(formula, actor, options = {}) {
           </div>
           <div class="cdt-damage-result">
             <span class="cdt-damage-total">${roll.total}</span>
-            <span class="cdt-damage-formula">${sanitizedFormula}</span>
+            <span class="cdt-damage-formula">${formula}</span>
           </div>
         </div>
       `,
@@ -886,47 +519,23 @@ export async function rollDamage(formula, actor, options = {}) {
       type: CONST.CHAT_MESSAGE_TYPES.ROLL
     };
     
-    await ChatMessage.create(messageData);
+    ChatMessage.create(messageData);
     return roll;
     
   } catch (error) {
     console.error("Clube dos Taberneiros | Erro na rolagem de dano:", error);
-    ui.notifications.error(`Erro ao rolar dano: ${error.message}`);
+    ui.notifications.error("Erro ao rolar dano");
     return null;
   }
 }
 
 /**
- * Rolagem de magia com gasto automático de PM - versão validada
- * @param {Object} actor - Ator conjurando a magia
- * @param {Object} spell - Item de magia
- * @param {Object} options - Opções adicionais
- * @returns {Promise<Object|null>} Resultado da conjuração ou null se erro
+ * Rolagem de magia com gasto automático de PM
  */
 export async function rollSpell(actor, spell, options = {}) {
   try {
-    // Validação robusta de entrada
-    if (!actor || !actor.system) {
-      ui.notifications.error("Ator inválido para conjuração");
-      console.error("Clube dos Taberneiros | Ator inválido:", actor);
-      return null;
-    }
-    
-    if (!spell || !spell.system) {
-      ui.notifications.error("Magia inválida para conjuração");
-      console.error("Clube dos Taberneiros | Magia inválida:", spell);
-      return null;
-    }
-    
-    if (spell.type !== "magia") {
-      ui.notifications.error("Item não é uma magia");
-      return null;
-    }
-    
-    // Validar e sanitizar valores
-    const custoMP = Math.max(0, parseInt(spell.system.custoMP) || 1);
-    const pmAtual = Math.max(0, parseInt(actor.system.pm?.value) || 0);
-    const nivelMagia = Math.max(0, Math.min(9, parseInt(spell.system.nivel) || 1));
+    const custoMP = spell.system.custoMP || 1;
+    const pmAtual = actor.system.pm?.value || 0;
     
     // Verificar se tem PM suficiente
     if (pmAtual < custoMP) {
@@ -934,17 +543,8 @@ export async function rollSpell(actor, spell, options = {}) {
       return null;
     }
     
-    // Verificar se tem o atributo Mental
-    if (!actor.system.mental || typeof actor.system.mental.value !== 'number') {
-      ui.notifications.error("Personagem não possui atributo Mental válido");
-      return null;
-    }
-    
-    // Calcular dificuldade da conjuração
-    const baseDifficulty = 8 + nivelMagia;
-    const difficulty = Math.max(5, Math.min(20, parseInt(options.difficulty) || baseDifficulty));
-    
     // Fazer teste de conjuração
+    const difficulty = options.difficulty || (8 + spell.system.nivel);
     const rollResult = await rollTest(actor, "mental", 0, difficulty, {
       flavor: `Conjuração de ${spell.name}`,
       onCriticalSuccess: () => {
@@ -955,59 +555,41 @@ export async function rollSpell(actor, spell, options = {}) {
       }
     });
     
-    // Processar resultado da conjuração
     if (rollResult) {
-      // Verificar configuração de gasto de PM
+      // Gastar PM independente do resultado (pode ser configurado)
       const gastaPMSempre = game.settings.get("clube-dos-taberneiros", "gastaPMSempre") ?? true;
-      const sucessoOuCritico = rollResult.resultType === "success" || rollResult.resultType === "criticalSuccess";
       
-      // Gastar PM conforme configuração
-      if (sucessoOuCritico || gastaPMSempre) {
-        const novoValorPM = Math.max(0, pmAtual - custoMP);
-        
-        try {
-          await actor.update({
-            "system.pm.value": novoValorPM
-          }, { skipDerivedCalculation: true });
-          
-          ui.notifications.info(`${custoMP} PM gastos. PM restante: ${novoValorPM}`);
-        } catch (updateError) {
-          console.error("Clube dos Taberneiros | Erro ao atualizar PM:", updateError);
-          ui.notifications.warn("Erro ao gastar PM, mas magia foi conjurada");
-        }
-      }
-      
-      // Criar informações da magia para o chat
-      try {
-        const escola = spell.system.escola || "evocacao";
-        const escolaDisplay = game.i18n.localize(`CDT.${escola.charAt(0).toUpperCase() + escola.slice(1)}`) || escola;
-        
-        const spellInfo = `
-          <div class="cdt-spell-info">
-            <div><strong>Escola:</strong> ${escolaDisplay}</div>
-            <div><strong>Nível:</strong> ${nivelMagia}</div>
-            <div><strong>Alcance:</strong> ${spell.system.alcance || "Toque"}</div>
-            <div><strong>Duração:</strong> ${spell.system.duracao || "Instantâneo"}</div>
-            ${spell.system.dano ? `<div><strong>Dano:</strong> ${spell.system.dano}</div>` : ''}
-            <div class="cdt-spell-description">${spell.system.descricao || "Sem descrição"}</div>
-          </div>
-        `;
-        
-        await ChatMessage.create({
-          speaker: ChatMessage.getSpeaker({ actor }),
-          content: spellInfo
+      if (rollResult.resultType === "success" || rollResult.resultType === "criticalSuccess" || gastaPMSempre) {
+        await actor.update({
+          "system.pm.value": Math.max(0, pmAtual - custoMP)
         });
-      } catch (chatError) {
-        console.error("Clube dos Taberneiros | Erro ao criar mensagem de magia:", chatError);
-        // Não interromper o fluxo por erro de chat
+        
+        ui.notifications.info(`${custoMP} PM gastos. PM restante: ${pmAtual - custoMP}`);
       }
+      
+      // Adicionar informações da magia ao chat
+      const spellInfo = `
+        <div class="cdt-spell-info">
+          <div><strong>Escola:</strong> ${game.i18n.localize(`CDT.${spell.system.escola.charAt(0).toUpperCase() + spell.system.escola.slice(1)}`)}</div>
+          <div><strong>Nível:</strong> ${spell.system.nivel}</div>
+          <div><strong>Alcance:</strong> ${spell.system.alcance}</div>
+          <div><strong>Duração:</strong> ${spell.system.duracao}</div>
+          ${spell.system.dano ? `<div><strong>Dano:</strong> ${spell.system.dano}</div>` : ''}
+          <div class="cdt-spell-description">${spell.system.descricao}</div>
+        </div>
+      `;
+      
+      ChatMessage.create({
+        speaker: ChatMessage.getSpeaker({ actor }),
+        content: spellInfo
+      });
     }
     
     return rollResult;
     
   } catch (error) {
-    console.error("Clube dos Taberneiros | Erro crítico na conjuração:", error);
-    ui.notifications.error(`Erro ao conjurar magia: ${error.message}`);
+    console.error("Clube dos Taberneiros | Erro na conjuração:", error);
+    ui.notifications.error("Erro ao conjurar magia");
     return null;
   }
 }
@@ -1073,107 +655,62 @@ export async function rollWeapon(actor, weapon, options = {}) {
 /*  Configurações de Sistema                    */
 /* -------------------------------------------- */
 
-// Configurações movidas para _configureSystemIntegrations() no hook init
+// Configurar sistema para usar 2d6 para iniciativa
+CONFIG.Combat.initiative = {
+  formula: "2d6 + @attributes.acao.value",
+  decimals: 0
+};
 
-/**
- * Hook executado quando o Foundry está completamente carregado
- * Registra configurações e inicializa recursos opcionais
- */
-Hooks.once("ready", async () => {
-  console.log('Clube dos Taberneiros | Sistema pronto - configurando...');
-  
-  try {
-    // Registrar configurações do sistema
-    _registerSystemSettings();
-    
-    // Configurar recursos adicionais baseado nas configurações
-    await _initializeSystemFeatures();
-    
-    // Validar integridade do sistema
-    _validateSystemIntegrity();
-    
-    console.log('Clube dos Taberneiros | Sistema configurado com sucesso!');
-  } catch (error) {
-    console.error('Clube dos Taberneiros | Erro na inicialização:', error);
-    ui.notifications.error("Erro na inicialização do sistema Clube dos Taberneiros");
+// Configurar atributos de token
+CONFIG.Actor.trackableAttributes = {
+  personagem: {
+    bar: ["pv", "pm"],
+    value: ["pv.value", "pm.value"]
+  },
+  npc: {
+    bar: ["pv", "pm"],
+    value: ["pv.value", "pm.value"]
+  },
+  criatura: {
+    bar: ["pv"],
+    value: ["pv.value"]
   }
-});
+};
 
-/**
- * Registrar todas as configurações do sistema
- * @private
- */
-function _registerSystemSettings() {
-  // Configuração: Gastar PM sempre
+// Registrar configurações do sistema
+Hooks.once("ready", () => {
   game.settings.register("clube-dos-taberneiros", "gastaPMSempre", {
-    name: "CDT.Settings.GastaPMSempre.Name",
-    hint: "CDT.Settings.GastaPMSempre.Hint", 
+    name: "Gastar PM Sempre",
+    hint: "Se habilitado, PM é gasto mesmo quando a conjuração falha",
     scope: "world",
     config: true,
     type: Boolean,
     default: true
   });
 
-  // Configuração: Mostrar fórmulas
   game.settings.register("clube-dos-taberneiros", "mostrarFormulas", {
-    name: "CDT.Settings.MostrarFormulas.Name",
-    hint: "CDT.Settings.MostrarFormulas.Hint",
-    scope: "client", 
-    config: true,
-    type: Boolean,
-    default: true
-  });
-
-  // Configuração: Criar macros automaticamente
-  game.settings.register("clube-dos-taberneiros", "criarMacrosAuto", {
-    name: "CDT.Settings.CriarMacrosAuto.Name",
-    hint: "CDT.Settings.CriarMacrosAuto.Hint",
-    scope: "world",
-    config: true,
-    type: Boolean,
-    default: true
-  });
-  
-  // Configuração: Debug mode
-  game.settings.register("clube-dos-taberneiros", "debugMode", {
-    name: "CDT.Settings.DebugMode.Name", 
-    hint: "CDT.Settings.DebugMode.Hint",
+    name: "Mostrar Fórmulas de Rolagem",
+    hint: "Exibe as fórmulas detalhadas nas rolagens",
     scope: "client",
     config: true,
     type: Boolean,
-    default: false
+    default: true
   });
-}
 
-/**
- * Inicializar recursos opcionais do sistema
- * @private
- */
-async function _initializeSystemFeatures() {
+  game.settings.register("clube-dos-taberneiros", "criarMacrosAuto", {
+    name: "Criar Macros Automaticamente",
+    hint: "Cria macros pré-definidas para testes rápidos",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true
+  });
+
   // Criar macros pré-definidas se habilitado
   if (game.settings.get("clube-dos-taberneiros", "criarMacrosAuto")) {
-    await _createPredefinedMacros();
+    _createPredefinedMacros();
   }
-  
-  // Configurar modo debug se habilitado
-  if (game.settings.get("clube-dos-taberneiros", "debugMode")) {
-    console.log('Clube dos Taberneiros | Modo debug ativado');
-    window.CDT_DEBUG = true;
-  }
-}
-
-/**
- * Validar integridade básica do sistema
- * @private
- */
-function _validateSystemIntegrity() {
-  const requiredFunctions = ['rollTest', 'rollDamage', 'rollSpell', 'rollWeapon'];
-  const missingFunctions = requiredFunctions.filter(fn => typeof game.cdt[fn] !== 'function');
-  
-  if (missingFunctions.length > 0) {
-    console.warn('Clube dos Taberneiros | Funções faltando:', missingFunctions);
-  }
-}
+});
 
 /**
  * Criar macros pré-definidas
