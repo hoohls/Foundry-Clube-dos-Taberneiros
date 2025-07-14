@@ -134,7 +134,7 @@
     "arma": {
       "templates": ["base", "equipavel"],
       "categoria": "corpo-a-corpo",
-      "tipo": "leve",
+      "tipo": "simples",
       "dano": "1d6",
       "alcance": "1.5m",
       "propriedades": [],
@@ -144,12 +144,9 @@
     "armadura": {
       "templates": ["base", "equipavel"],
       "categoria": "leve",
-      "protecao": 0,
       "defesa": 0,
-      "penalidades": {
-        "furtividade": 0,
-        "acao": 0
-      }
+      "penalidade": 0,
+      "deslocamentoMax": 0
     },
     "escudo": {
       "templates": ["base", "equipavel"],
@@ -166,10 +163,9 @@
     "pocao": {
       "templates": ["base"],
       "tipo": "cura",
+      "quantidade": 1,
       "efeito": "",
-      "duracao": "instantaneo",
-      "limitacao": "",
-      "recuperacao": ""
+      "duracao": "instantaneo"
     }
   }
 }
