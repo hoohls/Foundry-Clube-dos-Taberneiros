@@ -3,48 +3,43 @@ export class ClubeActor extends Actor {
   prepareData() {
     super.prepareData();
     
-    // Calcular valores derivados
-    this._calculateDerivedValues();
+    // Preparação mínima - apenas garantir estruturas básicas
+    this._ensureBasicStructures();
   }
 
   /**
-   * Calcular valores derivados como PV, PM e Defesa
+   * Garantir estruturas básicas apenas (não calcular valores derivados)
    */
-  _calculateDerivedValues() {
+  _ensureBasicStructures() {
     if (this.type === "personagem") {
       const system = this.system;
       
-      // Calcular PV máximo se não estiver definido
-      if (!system.pv?.max && system.fisico?.value) {
-        system.pv = system.pv || {};
-        system.pv.max = system.fisico.value * 3 + 10;
+      // Apenas garantir que estruturas existem - NÃO calcular valores
+      if (!system.pv) {
+        system.pv = { value: 10, max: 10 };
       }
       
-      // Calcular PM máximo se não estiver definido
-      if (!system.pm?.max && system.mental?.value) {
-        system.pm = system.pm || {};
-        system.pm.max = system.mental.value * 2 + 5;
+      if (!system.pm) {
+        system.pm = { value: 5, max: 5 };
       }
       
-      // Calcular Defesa
-      if (system.acao?.value) {
-        system.defesa = system.defesa || {};
-        system.defesa.value = 10 + system.acao.value + 
-          (system.defesa.armadura || 0) + (system.defesa.escudo || 0);
-      }
-      
-      // Inicializar recursos se não existirem
-      if (!system.recursos) {
-        system.recursos = {
-          moedas: {
-            cobre: 0,
-            prata: 0,
-            ouro: 0
-          }
+      if (!system.defesa) {
+        system.defesa = { 
+          value: 10, 
+          base: 10, 
+          armadura: 0, 
+          escudo: 0, 
+          outros: 0 
         };
       }
       
-      // Inicializar detalhes se não existirem
+      if (!system.recursos) {
+        system.recursos = {
+          moedas: { cobre: 0, prata: 0, ouro: 0 },
+          carga: { atual: 0, max: 40 }
+        };
+      }
+      
       if (!system.detalhes) {
         system.detalhes = {
           aparencia: "",

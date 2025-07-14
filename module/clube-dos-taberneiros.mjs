@@ -188,36 +188,49 @@ function _initializeCharacterValues(system) {
   return updates;
 }
 
-// Hook melhorado para atualizações de ator
+// Hook simplificado para atualizações de ator
 Hooks.on("updateActor", (actor, changes, options, userId) => {
-  if (actor.type === "personagem" && !options.skipDerivedCalculation && !options.fromUserInput) {
-    // Aguardar um pouco para permitir que inputs do usuário sejam processados primeiro
+  // Só calcular valores derivados se não foi explicitamente desabilitado
+  if (actor.type === "personagem" && !options.skipDerivedCalculation) {
+    // Usar setTimeout para evitar conflitos de timing
     setTimeout(() => {
-      const updates = _calculateDerivedValues(actor.system, changes);
-      
-      if (Object.keys(updates).length > 0) {
-        actor.update(updates, { skipDerivedCalculation: true });
+      try {
+        const updates = _calculateDerivedValues(actor.system, changes);
+        
+        if (Object.keys(updates).length > 0) {
+          actor.update(updates, { skipDerivedCalculation: true });
+        }
+      } catch (error) {
+        console.error("Clube dos Taberneiros | Erro nos cálculos derivados:", error);
       }
-    }, 100);
+    }, 50); // Timeout muito menor
   }
 });
 
-// Hook para quando itens são adicionados/removidos
+// Hooks para quando itens são adicionados/removidos - com proteção
 Hooks.on("createItem", (item, options, userId) => {
-  if (item.parent && item.parent.type === "personagem") {
-    _updateActorFromItems(item.parent);
+  if (item.parent && item.parent.type === "personagem" && !options.skipActorUpdate) {
+    setTimeout(() => _updateActorFromItems(item.parent), 100);
   }
 });
 
 Hooks.on("updateItem", (item, changes, options, userId) => {
-  if (item.parent && item.parent.type === "personagem") {
-    _updateActorFromItems(item.parent);
+  if (item.parent && item.parent.type === "personagem" && !options.skipActorUpdate) {
+    // Só atualizar se mudanças relevantes para equipamento
+    const relevantChanges = ['equipado', 'defesa', 'peso', 'quantidade'];
+    const hasRelevantChanges = relevantChanges.some(field => 
+      changes.system && changes.system.hasOwnProperty(field)
+    );
+    
+    if (hasRelevantChanges) {
+      setTimeout(() => _updateActorFromItems(item.parent), 100);
+    }
   }
 });
 
 Hooks.on("deleteItem", (item, options, userId) => {
-  if (item.parent && item.parent.type === "personagem") {
-    _updateActorFromItems(item.parent);
+  if (item.parent && item.parent.type === "personagem" && !options.skipActorUpdate) {
+    setTimeout(() => _updateActorFromItems(item.parent), 100);
   }
 });
 
@@ -228,53 +241,52 @@ Hooks.on("deleteItem", (item, options, userId) => {
 function _calculateDerivedValues(system, changes = {}) {
   const updates = {};
   
-  try {
-    // Garantir valores mínimos para atributos APENAS se o valor foi especificamente alterado
-    ['fisico', 'acao', 'mental', 'social'].forEach(attr => {
-      if (changes.system?.[attr]?.value !== undefined && changes.system[attr].value < 1) {
-        updates[`system.${attr}.value`] = 1;
-      }
-    });
-
-    // Recalcular PV máximo APENAS se Físico mudou especificamente
-    if (changes.system?.fisico?.value !== undefined) {
-      const fisicoValue = changes.system.fisico.value;
-      const newPvMax = Math.max(1, fisicoValue * 3 + 10);
+  // SER ULTRA CONSERVADOR - só atualizar o que realmente mudou
+  
+  // Recalcular PV máximo APENAS se Físico mudou especificamente
+  if (changes.system?.fisico?.value !== undefined) {
+    const fisicoValue = parseInt(changes.system.fisico.value) || 4;
+    const newPvMax = Math.max(1, fisicoValue * 3 + 10);
+    
+    // Só atualizar se realmente mudou
+    if (system.pv?.max !== newPvMax) {
       updates["system.pv.max"] = newPvMax;
       
-      // Se PV atual é maior que o novo máximo, ajustar
+      // Ajustar PV atual apenas se necessário
       if (system.pv?.value > newPvMax) {
         updates["system.pv.value"] = newPvMax;
       }
     }
+  }
+  
+  // Recalcular PM máximo APENAS se Mental mudou especificamente
+  if (changes.system?.mental?.value !== undefined) {
+    const mentalValue = parseInt(changes.system.mental.value) || 4;
+    const newPmMax = Math.max(0, mentalValue * 2 + 5);
     
-    // Recalcular PM máximo APENAS se Mental mudou especificamente
-    if (changes.system?.mental?.value !== undefined) {
-      const mentalValue = changes.system.mental.value;
-      const newPmMax = Math.max(0, mentalValue * 2 + 5);
+    // Só atualizar se realmente mudou
+    if (system.pm?.max !== newPmMax) {
       updates["system.pm.max"] = newPmMax;
       
-      // Se PM atual é maior que o novo máximo, ajustar
+      // Ajustar PM atual apenas se necessário
       if (system.pm?.value > newPmMax) {
         updates["system.pm.value"] = newPmMax;
       }
     }
+  }
+  
+  // Recalcular Defesa APENAS se Ação mudou especificamente
+  if (changes.system?.acao?.value !== undefined) {
+    const acaoValue = parseInt(changes.system.acao.value) || 4;
+    const armaduraBonus = system.defesa?.armadura || 0;
+    const escudoBonus = system.defesa?.escudo || 0;
+    const outrosBonus = system.defesa?.outros || 0;
+    const newDefesa = 10 + acaoValue + armaduraBonus + escudoBonus + outrosBonus;
     
-    // Recalcular Defesa APENAS se Ação mudou especificamente
-    if (changes.system?.acao?.value !== undefined) {
-      const acaoValue = changes.system.acao.value;
-      const armaduraBonus = system.defesa?.armadura || 0;
-      const escudoBonus = system.defesa?.escudo || 0;
-      const outrosBonus = system.defesa?.outros || 0;
-      
-      updates["system.defesa.value"] = 10 + acaoValue + armaduraBonus + escudoBonus + outrosBonus;
+    // Só atualizar se realmente mudou
+    if (system.defesa?.value !== newDefesa) {
+      updates["system.defesa.value"] = newDefesa;
     }
-
-    // Não inicializar estruturas durante updates normais
-    // (isso é feito apenas na criação do personagem)
-
-  } catch (error) {
-    console.error("Clube dos Taberneiros | Erro no cálculo de valores derivados:", error);
   }
 
   return updates;
@@ -304,14 +316,27 @@ function _updateActorFromItems(actor) {
       }
     });
 
-    // Atualizar defesa com equipamentos
-    updates["system.defesa.armadura"] = armaduraDefesa;
-    updates["system.defesa.escudo"] = escudoDefesa;
-    updates["system.defesa.value"] = 10 + (actor.system.acao?.value || 4) + armaduraDefesa + escudoDefesa + (actor.system.defesa?.outros || 0);
+    // Só atualizar se realmente mudou
+    if (actor.system.defesa?.armadura !== armaduraDefesa) {
+      updates["system.defesa.armadura"] = armaduraDefesa;
+    }
     
-    // Atualizar carga
-    updates["system.recursos.carga.atual"] = Math.round(cargaAtual * 10) / 10;
+    if (actor.system.defesa?.escudo !== escudoDefesa) {
+      updates["system.defesa.escudo"] = escudoDefesa;
+    }
+    
+    const newDefesa = 10 + (actor.system.acao?.value || 4) + armaduraDefesa + escudoDefesa + (actor.system.defesa?.outros || 0);
+    if (actor.system.defesa?.value !== newDefesa) {
+      updates["system.defesa.value"] = newDefesa;
+    }
+    
+    // Atualizar carga apenas se mudou significativamente
+    const newCarga = Math.round(cargaAtual * 10) / 10;
+    if (Math.abs((actor.system.recursos?.carga?.atual || 0) - newCarga) > 0.1) {
+      updates["system.recursos.carga.atual"] = newCarga;
+    }
 
+    // Só fazer update se há mudanças reais
     if (Object.keys(updates).length > 0) {
       actor.update(updates, { skipDerivedCalculation: true });
     }
