@@ -49,19 +49,43 @@
           <div class="atributo-grid">
             <div class="atributo">
               <label>{{localize "CDT.Fisico"}}</label>
-              <input type="number" name="system.fisico.value" value="{{system.fisico.value}}" min="1" max="10"/>
+              <div class="atributo-container">
+                <input type="number" name="system.fisico.value" value="{{system.fisico.value}}" min="1" max="10"/>
+                <button type="button" class="attribute-roll cdt-tooltip" data-attribute="fisico" 
+                        data-tooltip="Clique para rolar teste de Físico">
+                  <i class="fas fa-dice-d6"></i>
+                </button>
+              </div>
             </div>
             <div class="atributo">
               <label>{{localize "CDT.Acao"}}</label>
-              <input type="number" name="system.acao.value" value="{{system.acao.value}}" min="1" max="10"/>
+              <div class="atributo-container">
+                <input type="number" name="system.acao.value" value="{{system.acao.value}}" min="1" max="10"/>
+                <button type="button" class="attribute-roll cdt-tooltip" data-attribute="acao" 
+                        data-tooltip="Clique para rolar teste de Ação">
+                  <i class="fas fa-dice-d6"></i>
+                </button>
+              </div>
             </div>
             <div class="atributo">
               <label>{{localize "CDT.Mental"}}</label>
-              <input type="number" name="system.mental.value" value="{{system.mental.value}}" min="1" max="10"/>
+              <div class="atributo-container">
+                <input type="number" name="system.mental.value" value="{{system.mental.value}}" min="1" max="10"/>
+                <button type="button" class="attribute-roll cdt-tooltip" data-attribute="mental" 
+                        data-tooltip="Clique para rolar teste de Mental">
+                  <i class="fas fa-dice-d6"></i>
+                </button>
+              </div>
             </div>
             <div class="atributo">
               <label>{{localize "CDT.Social"}}</label>
-              <input type="number" name="system.social.value" value="{{system.social.value}}" min="1" max="10"/>
+              <div class="atributo-container">
+                <input type="number" name="system.social.value" value="{{system.social.value}}" min="1" max="10"/>
+                <button type="button" class="attribute-roll cdt-tooltip" data-attribute="social" 
+                        data-tooltip="Clique para rolar teste de Social">
+                  <i class="fas fa-dice-d6"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -69,14 +93,26 @@
         {{!-- Recursos --}}
         <div class="recursos">
           <h3>{{localize "CDT.Recursos"}}</h3>
+          
+          {{!-- Pontos de Vida --}}
           <div class="resource">
-            <label class="resource-label">{{localize "CDT.PontosVida"}}</label>
+            <label class="resource-label">
+              <span class="cdt-status-indicator {{statusHealth}}"></span>
+              {{localize "CDT.PontosVida"}}
+            </label>
             <div class="resource-content flexrow flex-center flex-between">
               <input type="number" name="system.pv.value" value="{{system.pv.value}}" min="0" max="{{system.pv.max}}"/>
               <span> / </span>
               <input type="number" name="system.pv.max" value="{{system.pv.max}}" min="1"/>
             </div>
+            <div class="resource-bar">
+              <div class="resource-bar-fill {{#if (lt system.pv.value (div system.pv.max 4))}}low{{/if}}" 
+                   style="width: {{mult (div system.pv.value system.pv.max) 100}}%"></div>
+              <div class="resource-bar-text">{{system.pv.value}}/{{system.pv.max}}</div>
+            </div>
           </div>
+
+          {{!-- Pontos de Magia --}}
           <div class="resource">
             <label class="resource-label">{{localize "CDT.PontosMagia"}}</label>
             <div class="resource-content flexrow flex-center flex-between">
@@ -84,13 +120,50 @@
               <span> / </span>
               <input type="number" name="system.pm.max" value="{{system.pm.max}}" min="0"/>
             </div>
+            <div class="resource-bar">
+              <div class="resource-bar-fill" style="width: {{mult (div system.pm.value system.pm.max) 100}}%"></div>
+              <div class="resource-bar-text">{{system.pm.value}}/{{system.pm.max}}</div>
+            </div>
           </div>
+
+          {{!-- Defesa --}}
           <div class="resource">
-            <label class="resource-label">{{localize "CDT.Defesa"}}</label>
+            <label class="resource-label cdt-tooltip" data-tooltip="Defesa = 10 + Ação + Armadura + Escudo + Outros">
+              {{localize "CDT.Defesa"}}
+            </label>
             <div class="resource-content flexrow flex-center flex-between">
               <span class="resource-value">{{system.defesa.value}}</span>
               <span class="resource-formula">(10 + {{system.acao.value}} + {{system.defesa.armadura}} + {{system.defesa.escudo}})</span>
             </div>
+          </div>
+
+          {{!-- Carga --}}
+          <div class="resource">
+            <label class="resource-label">
+              {{localize "CDT.Carga"}} 
+              <span class="encumbrance-status {{encumbrance}}">
+                {{#eq encumbrance "over-encumbered"}}⚠️{{/eq}}
+                {{#eq encumbrance "heavily-loaded"}}📦{{/eq}}
+              </span>
+            </label>
+            <div class="resource-content flexrow flex-center flex-between">
+              <span class="resource-value">{{system.recursos.carga.atual}}kg</span>
+              <span>/ {{system.recursos.carga.max}}kg</span>
+            </div>
+            <div class="resource-bar">
+              <div class="resource-bar-fill {{#if (gte (div system.recursos.carga.atual system.recursos.carga.max) 0.75)}}low{{/if}}" 
+                   style="width: {{mult (div system.recursos.carga.atual system.recursos.carga.max) 100}}%"></div>
+            </div>
+          </div>
+
+          {{!-- Botões de Descanso --}}
+          <div class="rest-buttons">
+            <button type="button" class="quick-rest cdt-tooltip" data-tooltip="Recupera metade dos PV e PM">
+              <i class="fas fa-bed"></i> Descanso Rápido
+            </button>
+            <button type="button" class="long-rest cdt-tooltip" data-tooltip="Recupera todos os PV e PM">
+              <i class="fas fa-moon"></i> Descanso Longo
+            </button>
           </div>
         </div>
       </div>
@@ -125,16 +198,21 @@
       </div>
       <ol class="items-list">
         {{#each habilidades as |item id|}}
-        <li class="item flexrow" data-item-id="{{item._id}}">
+        <li class="item flexrow {{#unless item.canUse}}disabled{{/unless}}" data-item-id="{{item._id}}">
           <div class="item-name flexrow">
             <div class="item-image">
-              <a class="rollable" data-roll-type="item" data-item-id="{{item._id}}">
+              <a class="rollable" data-roll-type="habilidade" data-item-id="{{item._id}}"
+                 title="{{#if item.canUse}}Clique para usar{{else}}Pré-requisitos não atendidos{{/if}}">
                 <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
               </a>
             </div>
-            <h4>{{item.name}}</h4>
+            <h4>{{item.name}}
+              {{#if item.system.passiva}}<small>(Passiva)</small>{{/if}}
+              {{#unless item.canUse}}<small class="prereq-warning">⚠️</small>{{/unless}}
+            </h4>
           </div>
-          <div class="item-bonus">+{{item.system.bonus}}</div>
+          <div class="item-attribute">{{capitalize item.system.atributo}}</div>
+          <div class="item-bonus">{{signedNumber item.system.bonus}}</div>
           <div class="item-controls">
             <a class="item-control" data-action="edit" title="Editar Item">
               <i class="fas fa-edit"></i>
@@ -151,22 +229,28 @@
     {{!-- Magias Tab --}}
     <div class="tab magias" data-group="primary" data-tab="magias">
       <div class="items-header">
-        <h3>{{localize "CDT.Magias"}}</h3>
+        <h3>{{localize "CDT.Magias"}} 
+          <small>(PM: {{system.pm.value}}/{{system.pm.max}})</small>
+        </h3>
         <a class="item-control" data-action="create" data-type="magia" title="Criar Magia">
           <i class="fas fa-plus"></i>
         </a>
       </div>
       <ol class="items-list">
         {{#each magias as |item id|}}
-        <li class="item flexrow" data-item-id="{{item._id}}">
+        <li class="item flexrow {{#if (gt item.system.custoMP ../system.pm.value)}}insufficient-mp{{/if}}" data-item-id="{{item._id}}">
           <div class="item-name flexrow">
             <div class="item-image">
-              <a class="rollable" data-roll-type="spell" data-item-id="{{item._id}}">
+              <a class="rollable" data-roll-type="magia" data-item-id="{{item._id}}"
+                 title="{{#if (gte ../system.pm.value item.system.custoMP)}}Clique para conjurar{{else}}MP insuficiente{{/if}}">
                 <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
               </a>
             </div>
-            <h4>{{item.name}}</h4>
+            <h4>{{item.name}}
+              {{#if (gt item.system.custoMP ../system.pm.value)}}<small class="mp-warning">⚡</small>{{/if}}
+            </h4>
           </div>
+          <div class="item-school">{{capitalize item.system.escola}}</div>
           <div class="item-level">Nível {{item.system.nivel}}</div>
           <div class="item-cost">{{item.system.custoMP}} PM</div>
           <div class="item-controls">
@@ -186,28 +270,38 @@
     <div class="tab equipamentos" data-group="primary" data-tab="equipamentos">
       <div class="items-header">
         <h3>{{localize "CDT.Equipamentos"}}</h3>
-        <a class="item-control" data-action="create" data-type="equipamento" title="Criar Equipamento">
-          <i class="fas fa-plus"></i>
-        </a>
+        <div class="equipment-actions">
+          <a class="item-control" data-action="create" data-type="arma" title="Criar Arma">
+            <i class="fas fa-sword"></i>
+          </a>
+          <a class="item-control" data-action="create" data-type="armadura" title="Criar Armadura">
+            <i class="fas fa-shield-alt"></i>
+          </a>
+          <a class="item-control" data-action="create" data-type="equipamento" title="Criar Equipamento">
+            <i class="fas fa-plus"></i>
+          </a>
+        </div>
       </div>
       
       {{!-- Armas --}}
       <div class="items-section">
-        <h4>Armas</h4>
+        <h4><i class="fas fa-sword"></i> Armas</h4>
         <ol class="items-list">
           {{#each armas as |item id|}}
-          <li class="item flexrow" data-item-id="{{item._id}}">
+          <li class="item flexrow {{#unless item.system.equipado}}unequipped{{/unless}}" data-item-id="{{item._id}}">
             <div class="item-name flexrow">
               <div class="item-image">
-                <a class="rollable" data-roll-type="weapon" data-item-id="{{item._id}}">
+                <a class="rollable" data-roll-type="arma" data-item-id="{{item._id}}"
+                   title="{{#if item.system.equipado}}Clique para atacar{{else}}Arma não equipada{{/if}}">
                   <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
                 </a>
               </div>
               <h4>{{item.name}}</h4>
             </div>
-            <div class="item-damage">{{item.system.dano}}</div>
+            <div class="item-damage cdt-tooltip" data-tooltip="Dano da arma">{{item.system.dano}}</div>
             <div class="item-equipped">
-              <input type="checkbox" name="items.{{item._id}}.system.equipado" {{checked item.system.equipado}}/>
+              <input type="checkbox" class="item-toggle" {{checked item.system.equipado}} 
+                     title="Equipar/Desequipar"/>
             </div>
             <div class="item-controls">
               <a class="item-control" data-action="edit" title="Editar Item">
@@ -224,19 +318,43 @@
 
       {{!-- Armaduras --}}
       <div class="items-section">
-        <h4>Armaduras</h4>
+        <h4><i class="fas fa-shield-alt"></i> Armaduras & Escudos</h4>
         <ol class="items-list">
           {{#each armaduras as |item id|}}
-          <li class="item flexrow" data-item-id="{{item._id}}">
+          <li class="item flexrow {{#unless item.system.equipado}}unequipped{{/unless}}" data-item-id="{{item._id}}">
             <div class="item-name flexrow">
               <div class="item-image">
                 <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
               </div>
               <h4>{{item.name}}</h4>
             </div>
-            <div class="item-defense">+{{item.system.defesa}}</div>
+            <div class="item-defense cdt-tooltip" data-tooltip="Bônus de defesa">+{{item.system.defesa}}</div>
             <div class="item-equipped">
-              <input type="checkbox" name="items.{{item._id}}.system.equipado" {{checked item.system.equipado}}/>
+              <input type="checkbox" class="item-toggle" {{checked item.system.equipado}} 
+                     title="Equipar/Desequipar"/>
+            </div>
+            <div class="item-controls">
+              <a class="item-control" data-action="edit" title="Editar Item">
+                <i class="fas fa-edit"></i>
+              </a>
+              <a class="item-control" data-action="delete" title="Deletar Item">
+                <i class="fas fa-trash"></i>
+              </a>
+            </div>
+          </li>
+          {{/each}}
+          {{#each escudos as |item id|}}
+          <li class="item flexrow {{#unless item.system.equipado}}unequipped{{/unless}}" data-item-id="{{item._id}}">
+            <div class="item-name flexrow">
+              <div class="item-image">
+                <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+              </div>
+              <h4>{{item.name}} (Escudo)</h4>
+            </div>
+            <div class="item-defense cdt-tooltip" data-tooltip="Bônus de defesa">+{{item.system.defesa}}</div>
+            <div class="item-equipped">
+              <input type="checkbox" class="item-toggle" {{checked item.system.equipado}} 
+                     title="Equipar/Desequipar"/>
             </div>
             <div class="item-controls">
               <a class="item-control" data-action="edit" title="Editar Item">
@@ -251,9 +369,41 @@
         </ol>
       </div>
 
+      {{!-- Poções --}}
+      {{#if pocoes}}
+      <div class="items-section">
+        <h4><i class="fas fa-flask"></i> Poções</h4>
+        <ol class="items-list">
+          {{#each pocoes as |item id|}}
+          <li class="item flexrow" data-item-id="{{item._id}}">
+            <div class="item-name flexrow">
+              <div class="item-image">
+                <a class="rollable" data-roll-type="pocao" data-item-id="{{item._id}}"
+                   title="Clique para usar">
+                  <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+                </a>
+              </div>
+              <h4>{{item.name}}</h4>
+            </div>
+            <div class="item-type">{{capitalize item.system.tipo}}</div>
+            <div class="item-quantity">{{item.system.quantidade}}</div>
+            <div class="item-controls">
+              <a class="item-control" data-action="edit" title="Editar Item">
+                <i class="fas fa-edit"></i>
+              </a>
+              <a class="item-control" data-action="delete" title="Deletar Item">
+                <i class="fas fa-trash"></i>
+              </a>
+            </div>
+          </li>
+          {{/each}}
+        </ol>
+      </div>
+      {{/if}}
+
       {{!-- Outros Equipamentos --}}
       <div class="items-section">
-        <h4>Outros Equipamentos</h4>
+        <h4><i class="fas fa-backpack"></i> Outros Equipamentos</h4>
         <ol class="items-list">
           {{#each equipamentos as |item id|}}
           <li class="item flexrow" data-item-id="{{item._id}}">
@@ -277,6 +427,11 @@
           {{/each}}
         </ol>
       </div>
+
+      {{!-- Dropzone para Drag & Drop --}}
+      <div class="dropzone">
+        <p><i class="fas fa-download"></i> Arraste itens dos compêndios para cá</p>
+      </div>
     </div>
 
     {{!-- Biografia Tab --}}
@@ -299,7 +454,7 @@
       </div>
       <div class="biografia-section">
         <label>{{localize "CDT.Biografia"}}</label>
-        <textarea name="system.detalhes.biografia" placeholder="Biografia completa do personagem">{{system.detalhes.biografia}}</textarea>
+        <div class="editor-content" data-edit="system.detalhes.biografia">{{{enrichedBiography}}}</div>
       </div>
     </div>
 

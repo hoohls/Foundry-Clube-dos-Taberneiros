@@ -186,9 +186,49 @@ Este sistema é baseado no RPG Clube dos Taberneiros e é distribuído sob licen
 
 ---
 
-**Versão:** 1.0.0  
-**Compatibilidade:** Foundry VTT v11+  
-**Última Atualização:** [DATA]
+**Versão:** 2.0.0 🚀  
+**Compatibilidade:** Foundry VTT v11-v13  
+**Última Atualização:** Dezembro 2024
+
+## 🎉 **NOVO NA VERSÃO 2.0.0**
+
+### ⚡ **Sistema de Rolagem Revolucionário**
+- **Automação completa** com comparação automática de ND
+- **Críticos visuais** (12 = Sucesso Crítico, 2 = Falha Crítica)
+- **Margem de sucesso/falha** calculada automaticamente
+- **Animações especiais** para resultados críticos
+
+### 🎮 **Interface Completamente Redesenhada**
+- **Tooltips informativos** em todos os elementos
+- **Indicadores visuais** de saúde e status
+- **Botões de rolagem** integrados aos atributos
+- **Botões de descanso** rápido e longo
+- **Barras de recursos visuais** para PV, PM e carga
+
+### 🔮 **Magia e Combate Inteligentes**
+- **Gasto automático de PM** ao conjurar magias
+- **Verificação automática** de munição e equipamentos
+- **Dano crítico dobrado** automaticamente
+- **Efeitos especiais** para conjurações críticas
+
+### 📦 **Drag & Drop Aprimorado**
+- **Verificação automática** de pré-requisitos
+- **Modificações automáticas** baseadas no personagem
+- **Bônus de classe** aplicados automaticamente
+- **Confirmações inteligentes** para itens problemáticos
+
+### 🔮 **5 Macros Pré-definidas**
+1. **Teste de Atributo** - Dialog completo para testes
+2. **Iniciativa Rápida** - Para todos os tokens selecionados
+3. **Descanso Rápido** - Recuperação automática de recursos
+4. **Aplicar Dano** - Sistema de dano/cura em massa
+5. **Status do Grupo** - Tabela visual com status de todos
+
+### 🛡️ **Automação Total**
+- **Cálculos automáticos** de PV, PM e Defesa
+- **Atualização automática** baseada em equipamentos
+- **Validação robusta** de todos os valores
+- **Compatibilidade 100%** com mundos existentes
 
 Para mais informações, visite: [LINK_DO_PROJETO]
 

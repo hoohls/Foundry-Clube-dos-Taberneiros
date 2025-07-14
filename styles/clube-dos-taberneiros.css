@@ -11,6 +11,10 @@
   --cdt-success: #228b22;
   --cdt-danger: #dc143c;
   --cdt-warning: #ff8c00;
+  --cdt-critical: #ffd700;
+  --cdt-failure: #b22222;
+  --cdt-light-bg: #ffffff;
+  --cdt-shadow: rgba(0, 0, 0, 0.2);
 }
 
 /* ===== LAYOUT GERAL ===== */
@@ -46,9 +50,94 @@
   transition: transform 0.2s;
 }
 
-.clube-dos-taberneiros .profile-img:hover {
-  transform: scale(1.05);
-}
+  .clube-dos-taberneiros .profile-img:hover {
+    transform: scale(1.05);
+  }
+
+  /* ===== ATRIBUTOS APRIMORADOS ===== */
+  .clube-dos-taberneiros .atributo-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .clube-dos-taberneiros .atributo-container input {
+    flex: 1;
+  }
+
+  .clube-dos-taberneiros .attribute-roll {
+    padding: 4px 8px;
+    font-size: 12px;
+    min-width: auto;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .clube-dos-taberneiros .attribute-roll:hover {
+    background: var(--cdt-accent);
+    color: white;
+  }
+
+  /* ===== BOTÕES DE DESCANSO ===== */
+  .clube-dos-taberneiros .rest-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+  }
+
+  .clube-dos-taberneiros .rest-buttons button {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+
+  .clube-dos-taberneiros .quick-rest {
+    background: linear-gradient(135deg, var(--cdt-success), #32cd32);
+  }
+
+  .clube-dos-taberneiros .long-rest {
+    background: linear-gradient(135deg, var(--cdt-primary), #4169e1);
+  }
+
+  /* ===== INDICADORES DE STATUS ===== */
+  .clube-dos-taberneiros .disabled {
+    opacity: 0.6;
+    filter: grayscale(0.3);
+  }
+
+  .clube-dos-taberneiros .unequipped {
+    opacity: 0.7;
+  }
+
+  .clube-dos-taberneiros .insufficient-mp {
+    background: rgba(220, 20, 60, 0.1);
+    border-left: 3px solid var(--cdt-danger);
+  }
+
+  .clube-dos-taberneiros .prereq-warning,
+  .clube-dos-taberneiros .mp-warning {
+    color: var(--cdt-warning);
+    font-weight: bold;
+  }
+
+  .clube-dos-taberneiros .encumbrance-status {
+    font-size: 16px;
+  }
+
+  /* ===== EQUIPAMENTO ACTIONS ===== */
+  .clube-dos-taberneiros .equipment-actions {
+    display: flex;
+    gap: 5px;
+  }
+
+  .clube-dos-taberneiros .equipment-actions .item-control {
+    padding: 4px 8px;
+    font-size: 14px;
+  }
 
 .clube-dos-taberneiros .header-fields {
   flex: 1;
@@ -478,23 +567,470 @@
   color: var(--cdt-danger);
 }
 
+/* ===== SISTEMA DE ROLAGEM APRIMORADO ===== */
+
+/* Resultados de Rolagem */
+.cdt-roll-result {
+  border: 2px solid var(--cdt-border);
+  border-radius: 8px;
+  padding: 12px;
+  margin: 5px 0;
+  background: var(--cdt-light-bg);
+  box-shadow: 0 2px 4px var(--cdt-shadow);
+  transition: all 0.3s ease;
+}
+
+.cdt-roll-result.success {
+  border-color: var(--cdt-success);
+  background: linear-gradient(135deg, #ffffff, #f0fff0);
+}
+
+.cdt-roll-result.failure {
+  border-color: var(--cdt-failure);
+  background: linear-gradient(135deg, #ffffff, #fff0f0);
+}
+
+.cdt-roll-result.critical-success {
+  border-color: var(--cdt-critical);
+  background: linear-gradient(135deg, #ffffff, #fffef0);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+  animation: criticalPulse 2s ease-in-out;
+}
+
+.cdt-roll-result.critical-failure {
+  border-color: var(--cdt-danger);
+  background: linear-gradient(135deg, #ffffff, #ffe0e0);
+  box-shadow: 0 0 15px rgba(220, 20, 60, 0.4);
+  animation: failurePulse 2s ease-in-out;
+}
+
+@keyframes criticalPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+@keyframes failurePulse {
+  0%, 100% { transform: scale(1); }
+  25%, 75% { transform: scale(0.98); }
+}
+
+/* Cabeçalho da Rolagem */
+.cdt-roll-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--cdt-border);
+}
+
+.cdt-roll-header h3 {
+  margin: 0;
+  color: var(--cdt-primary);
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.cdt-roll-formula {
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--cdt-text);
+  background: rgba(0, 0, 0, 0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Corpo da Rolagem */
+.cdt-roll-body {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 15px;
+  align-items: center;
+}
+
+.cdt-dice-result {
+  text-align: center;
+}
+
+.cdt-dice-total {
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--cdt-primary);
+  text-shadow: 1px 1px 2px var(--cdt-shadow);
+}
+
+.cdt-natural-roll {
+  display: block;
+  font-size: 12px;
+  color: var(--cdt-text);
+  margin-top: 4px;
+}
+
+.cdt-difficulty {
+  text-align: center;
+  font-weight: bold;
+  color: var(--cdt-secondary);
+  font-size: 14px;
+}
+
+.cdt-result {
+  text-align: center;
+}
+
+.cdt-result strong {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.cdt-result.success strong {
+  color: var(--cdt-success);
+}
+
+.cdt-result.failure strong {
+  color: var(--cdt-failure);
+}
+
+.cdt-result.critical-success strong {
+  color: var(--cdt-critical);
+  text-shadow: 1px 1px 2px rgba(255, 215, 0, 0.3);
+}
+
+.cdt-result.critical-failure strong {
+  color: var(--cdt-danger);
+  text-shadow: 1px 1px 2px rgba(220, 20, 60, 0.3);
+}
+
+.success-margin, .failure-margin {
+  font-size: 12px;
+  font-weight: normal;
+}
+
+.success-margin {
+  color: var(--cdt-success);
+}
+
+.failure-margin {
+  color: var(--cdt-failure);
+}
+
+/* Rolagem de Dano */
+.cdt-damage-roll {
+  border: 2px solid var(--cdt-warning);
+  border-radius: 8px;
+  padding: 10px;
+  background: linear-gradient(135deg, #ffffff, #fff8f0);
+  margin: 5px 0;
+}
+
+.cdt-damage-header h3 {
+  margin: 0 0 8px 0;
+  color: var(--cdt-warning);
+  font-size: 14px;
+}
+
+.cdt-damage-result {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cdt-damage-total {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--cdt-warning);
+}
+
+.cdt-damage-formula {
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--cdt-text);
+}
+
+/* Informações de Magia */
+.cdt-spell-info {
+  border: 2px solid var(--cdt-primary);
+  border-radius: 8px;
+  padding: 12px;
+  background: linear-gradient(135deg, #ffffff, #f0f8ff);
+  margin: 5px 0;
+}
+
+.cdt-spell-info div {
+  margin: 4px 0;
+  font-size: 13px;
+}
+
+.cdt-spell-info strong {
+  color: var(--cdt-primary);
+}
+
+.cdt-spell-description {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--cdt-border);
+  font-style: italic;
+  color: var(--cdt-text);
+}
+
+/* ===== TOOLTIPS APRIMORADOS ===== */
+.cdt-tooltip {
+  position: relative;
+  cursor: help;
+}
+
+.cdt-tooltip::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--cdt-text);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+  box-shadow: 0 2px 8px var(--cdt-shadow);
+}
+
+.cdt-tooltip::after {
+  content: "";
+  position: absolute;
+  bottom: 115%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--cdt-text);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+.cdt-tooltip:hover::before,
+.cdt-tooltip:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ===== MELHORIAS DE INTERFACE ===== */
+
+/* Botões Aprimorados */
+.clube-dos-taberneiros button,
+.clube-dos-taberneiros .item-control {
+  background: linear-gradient(135deg, var(--cdt-primary), var(--cdt-secondary));
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 12px;
+}
+
+.clube-dos-taberneiros button:hover,
+.clube-dos-taberneiros .item-control:hover {
+  background: linear-gradient(135deg, var(--cdt-secondary), var(--cdt-primary));
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px var(--cdt-shadow);
+}
+
+.clube-dos-taberneiros button:active,
+.clube-dos-taberneiros .item-control:active {
+  transform: translateY(0);
+}
+
+/* Campos de Input Melhorados */
+.clube-dos-taberneiros input[type="text"],
+.clube-dos-taberneiros input[type="number"],
+.clube-dos-taberneiros textarea,
+.clube-dos-taberneiros select {
+  border: 2px solid var(--cdt-border);
+  border-radius: 4px;
+  padding: 6px 8px;
+  background: white;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.clube-dos-taberneiros input[type="text"]:focus,
+.clube-dos-taberneiros input[type="number"]:focus,
+.clube-dos-taberneiros textarea:focus,
+.clube-dos-taberneiros select:focus {
+  border-color: var(--cdt-primary);
+  box-shadow: 0 0 0 2px rgba(44, 90, 160, 0.2);
+  outline: none;
+}
+
+/* Indicadores de Status */
+.cdt-status-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.cdt-status-indicator.healthy {
+  background: var(--cdt-success);
+}
+
+.cdt-status-indicator.wounded {
+  background: var(--cdt-warning);
+}
+
+.cdt-status-indicator.critical {
+  background: var(--cdt-danger);
+  animation: criticalBlink 1s infinite;
+}
+
+@keyframes criticalBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.3; }
+}
+
+/* Barras de Recursos Melhoradas */
+.resource-bar {
+  position: relative;
+  height: 20px;
+  background: #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 4px 0;
+}
+
+.resource-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--cdt-success), var(--cdt-primary));
+  transition: width 0.3s ease;
+  border-radius: 10px;
+}
+
+.resource-bar-fill.low {
+  background: linear-gradient(90deg, var(--cdt-warning), var(--cdt-danger));
+}
+
+.resource-bar-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 11px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+}
+
 /* ===== RESPONSIVIDADE ===== */
 @media (max-width: 768px) {
+  .cdt-roll-body {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    text-align: center;
+  }
+  
   .clube-dos-taberneiros .sheet-header {
     flex-direction: column;
     text-align: center;
   }
   
-  .clube-dos-taberneiros .resource-row {
-    grid-template-columns: 1fr;
+  .clube-dos-taberneiros .profile-img {
+    width: 80px;
+    height: 80px;
   }
-  
-  .clube-dos-taberneiros .atributo-grid {
-    grid-template-columns: repeat(2, 1fr);
+}
+
+/* ===== ANIMAÇÕES DE ENTRADA ===== */
+.clube-dos-taberneiros .item {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
   }
-  
-  .clube-dos-taberneiros .moeda-grid {
-    grid-template-columns: 1fr;
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ===== DRAG AND DROP MELHORADO ===== */
+.clube-dos-taberneiros .item.dragging {
+  opacity: 0.5;
+  transform: rotate(5deg);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.clube-dos-taberneiros .dropzone {
+  border: 2px dashed var(--cdt-primary);
+  background: rgba(44, 90, 160, 0.1);
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  color: var(--cdt-primary);
+  transition: all 0.2s ease;
+}
+
+.clube-dos-taberneiros .dropzone.drag-over {
+  border-color: var(--cdt-accent);
+  background: rgba(212, 175, 55, 0.2);
+  color: var(--cdt-accent);
+}
+
+/* ===== INDICADORES DE ESTADO ===== */
+.cdt-loading {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--cdt-border);
+  border-radius: 50%;
+  border-top-color: var(--cdt-primary);
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== NOTIFICAÇÕES CUSTOMIZADAS ===== */
+.cdt-notification {
+  background: var(--cdt-light-bg);
+  border: 2px solid var(--cdt-border);
+  border-radius: 8px;
+  padding: 12px;
+  margin: 8px;
+  box-shadow: 0 4px 8px var(--cdt-shadow);
+  animation: notificationSlide 0.3s ease-out;
+}
+
+.cdt-notification.success {
+  border-color: var(--cdt-success);
+  background: linear-gradient(135deg, #ffffff, #f0fff0);
+}
+
+.cdt-notification.warning {
+  border-color: var(--cdt-warning);
+  background: linear-gradient(135deg, #ffffff, #fff8f0);
+}
+
+.cdt-notification.error {
+  border-color: var(--cdt-danger);
+  background: linear-gradient(135deg, #ffffff, #fff0f0);
+}
+
+@keyframes notificationSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

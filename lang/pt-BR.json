@@ -127,7 +127,15 @@
     "Colar": "Colar",
     "MaoPrincipal": "Mão Principal",
     "MaoSecundaria": "Mão Secundária",
-    "DuasMaos": "Duas Mãos"
+    "DuasMaos": "Duas Mãos",
+    "ConfirmDelete": "Confirmar Exclusão",
+    "ConfirmDeleteItem": "Tem certeza que deseja deletar '{name}'?",
+    "ItemDeleted": "'{name}' foi deletado",
+    "PrerequisitesNotMet": "Pré-requisitos não atendidos",
+    "SkillCriticalSuccess": "Sucesso crítico na habilidade!",
+    "UsePocao": "Usar Poção",
+    "ConfirmUsePocao": "Deseja usar '{name}'?",
+    "PocaoUsed": "'{name}' foi usada"
   },
   "CDT.Rolls": {
     "AtributoTest": "Teste de {atributo}",
@@ -136,7 +144,11 @@
     "AtaqueADistancia": "Ataque à Distância",
     "Conjuracao": "Conjuração de {magia}",
     "Dano": "Dano",
-    "Iniciativa": "Iniciativa"
+    "Iniciativa": "Iniciativa",
+    "Sucesso": "Sucesso",
+    "Falha": "Falha",
+    "SucessoCritico": "Sucesso Crítico",
+    "FalhaCritica": "Falha Crítica"
   },
   "CDT.Chat": {
     "RolledFor": "rolou para",
@@ -145,7 +157,44 @@
     "CriticalSuccess": "Sucesso Crítico",
     "CriticalFailure": "Falha Crítica",
     "Damage": "Dano",
-    "Healing": "Cura"
+    "Healing": "Cura",
+    "InsufficientMP": "PM insuficiente",
+    "MPSpent": "PM gastos",
+    "MPRemaining": "PM restante",
+    "WeaponNotEquipped": "Arma não está equipada",
+    "NoAmmo": "Sem munição",
+    "CriticalHit": "Acerto crítico! Dano dobrado!",
+    "CriticalMiss": "Falha crítica no ataque!"
+  },
+  "CDT.Difficulty": {
+    "Trivial": "Trivial",
+    "Easy": "Fácil",
+    "Moderate": "Moderada",
+    "Hard": "Difícil",
+    "VeryHard": "Muito Difícil",
+    "Heroic": "Heroica"
+  },
+  "CDT.Rest": {
+    "QuickRest": "Descanso Rápido",
+    "LongRest": "Descanso Longo",
+    "QuickRestConfirm": "Recuperar metade dos PV e PM?",
+    "LongRestConfirm": "Recuperar todos os PV e PM?",
+    "QuickRestDone": "Descanso rápido realizado!",
+    "LongRestDone": "Descanso longo realizado!"
+  },
+  "CDT.Status": {
+    "Healthy": "Saudável",
+    "Wounded": "Ferido",
+    "Critical": "Crítico",
+    "Normal": "Normal",
+    "Loaded": "Carregado",
+    "HeavilyLoaded": "Muito Carregado",
+    "OverEncumbered": "Sobrecarregado"
+  },
+  "CDT.Equipment": {
+    "CannotEquip": "Não é possível equipar este item",
+    "EquipSlotOccupied": "Slot de equipamento ocupado",
+    "UnequipFirst": "Desequipe primeiro o item atual"
   }
 }
 
