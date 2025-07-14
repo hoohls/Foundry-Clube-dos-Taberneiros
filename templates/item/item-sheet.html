@@ -1,0 +1,291 @@
+<form class="{{cssClass}} flexcol" autocomplete="off">
+  <header class="sheet-header">
+    <img class="item-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" height="64" width="64"/>
+    <div class="header-fields">
+      <h1 class="item-name"><input name="name" type="text" value="{{item.name}}" placeholder="Nome do Item"/></h1>
+      <div class="item-subtitle">{{itemType}}</div>
+    </div>
+  </header>
+
+  <section class="sheet-body">
+    <div class="item-properties">
+      
+      {{!-- Propriedades Básicas --}}
+      <div class="form-group">
+        <label>{{localize "CDT.Descricao"}}</label>
+        <textarea name="system.descricao" placeholder="Descrição do item">{{system.descricao}}</textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{localize "CDT.Preco"}}</label>
+          <div class="form-fields">
+            <input type="number" name="system.preco.valor" value="{{system.preco.valor}}" min="0" step="0.01"/>
+            <select name="system.preco.moeda">
+              <option value="MC" {{selected "MC" system.preco.moeda}}>MC</option>
+              <option value="MP" {{selected "MP" system.preco.moeda}}>MP</option>
+              <option value="MO" {{selected "MO" system.preco.moeda}}>MO</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>{{localize "CDT.Peso"}}</label>
+          <input type="number" name="system.peso" value="{{system.peso}}" min="0" step="0.1"/> kg
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{localize "CDT.NivelMinimo"}}</label>
+          <input type="number" name="system.nivelMinimo" value="{{system.nivelMinimo}}" min="1" max="10"/>
+        </div>
+        <div class="form-group">
+          <label>{{localize "CDT.Raridade"}}</label>
+          <select name="system.raridade">
+            <option value="comum" {{selected "comum" system.raridade}}>{{localize "CDT.Comum"}}</option>
+            <option value="incomum" {{selected "incomum" system.raridade}}>{{localize "CDT.Incomum"}}</option>
+            <option value="raro" {{selected "raro" system.raridade}}>{{localize "CDT.Raro"}}</option>
+            <option value="muito-raro" {{selected "muito-raro" system.raridade}}>{{localize "CDT.Muito Raro"}}</option>
+            <option value="lendario" {{selected "lendario" system.raridade}}>{{localize "CDT.Lendario"}}</option>
+            <option value="artefato" {{selected "artefato" system.raridade}}>{{localize "CDT.Artefato"}}</option>
+          </select>
+        </div>
+      </div>
+
+      {{!-- Propriedades Específicas por Tipo --}}
+      
+      {{#if (eq item.type "habilidade")}}
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{localize "CDT.Categoria"}}</label>
+          <select name="system.categoria">
+            <option value="combate" {{selected "combate" system.categoria}}>{{localize "CDT.Combate"}}</option>
+            <option value="magicas" {{selected "magicas" system.categoria}}>{{localize "CDT.Magicas"}}</option>
+            <option value="sociais" {{selected "sociais" system.categoria}}>{{localize "CDT.Sociais"}}</option>
+            <option value="gerais" {{selected "gerais" system.categoria}}>{{localize "CDT.Gerais"}}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{{localize "CDT.Atributo"}}</label>
+          <select name="system.atributo">
+            <option value="fisico" {{selected "fisico" system.atributo}}>{{localize "CDT.Fisico"}}</option>
+            <option value="acao" {{selected "acao" system.atributo}}>{{localize "CDT.Acao"}}</option>
+            <option value="mental" {{selected "mental" system.atributo}}>{{localize "CDT.Mental"}}</option>
+            <option value="social" {{selected "social" system.atributo}}>{{localize "CDT.Social"}}</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{localize "CDT.Bonus"}}</label>
+          <input type="number" name="system.bonus" value="{{system.bonus}}" min="0" max="5"/>
+        </div>
+        <div class="form-group">
+          <label>{{localize "CDT.Passiva"}}</label>
+          <input type="checkbox" name="system.passiva" {{checked system.passiva}}/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>{{localize "CDT.Prerequisitos"}}</label>
+        <input type="text" name="system.prerequisitos" value="{{system.prerequisitos}}" placeholder="Pré-requisitos"/>
+      </div>
+      <div class="form-group">
+        <label>{{localize "CDT.Efeito"}}</label>
+        <textarea name="system.efeito" placeholder="Efeito da habilidade">{{system.efeito}}</textarea>
+      </div>
+      {{/if}}
+
+      {{#if (eq item.type "magia")}}
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{localize "CDT.Escola"}}</label>
+          <select name="system.escola">
+            <option value="evocacao" {{selected "evocacao" system.escola}}>{{localize "CDT.Evocacao"}}</option>
+            <option value="abjuracao" {{selected "abjuracao" system.escola}}>{{localize "CDT.Abjuracao"}}</option>
+            <option value="transmutacao" {{selected "transmutacao" system.escola}}>{{localize "CDT.Transmutacao"}}</option>
+            <option value="ilusao" {{selected "ilusao" system.escola}}>{{localize "CDT.Ilusao"}}</option>
+            <option value="divinacao" {{selected "divinacao" system.escola}}>{{localize "CDT.Divinacao"}}</option>
+            <option value="necromancia" {{selected "necromancia" system.escola}}>{{localize "CDT.Necromancia"}}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{{localize "CDT.Nivel"}}</label>
+          <input type="number" name="system.nivel" value="{{system.nivel}}" min="1" max="6"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{localize "CDT.CustoMP"}}</label>
+          <input type="number" name="system.custoMP" value="{{system.custoMP}}" min="1"/>
+        </div>
+        <div class="form-group">
+          <label>{{localize "CDT.Alcance"}}</label>
+          <input type="text" name="system.alcance" value="{{system.alcance}}" placeholder="Alcance"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{localize "CDT.Duracao"}}</label>
+          <input type="text" name="system.duracao" value="{{system.duracao}}" placeholder="Duração"/>
+        </div>
+        <div class="form-group">
+          <label>{{localize "CDT.Dano"}}</label>
+          <input type="text" name="system.dano" value="{{system.dano}}" placeholder="Dano (ex: 2d6)"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>{{localize "CDT.Componentes"}}</label>
+        <div class="checkbox-row">
+          <label><input type="checkbox" name="system.componentes.verbal" {{checked system.componentes.verbal}}/> {{localize "CDT.Verbal"}}</label>
+          <label><input type="checkbox" name="system.componentes.somatico" {{checked system.componentes.somatico}}/> {{localize "CDT.Somatico"}}</label>
+          <label><input type="checkbox" name="system.componentes.material" {{checked system.componentes.material}}/> {{localize "CDT.Material"}}</label>
+        </div>
+        {{#if system.componentes.material}}
+        <input type="text" name="system.componentes.materialDescricao" value="{{system.componentes.materialDescricao}}" placeholder="Descrição do componente material"/>
+        {{/if}}
+      </div>
+      {{#if system.limitacao}}
+      <div class="form-group">
+        <label>{{localize "CDT.Limitacao"}}</label>
+        <input type="text" name="system.limitacao" value="{{system.limitacao}}" placeholder="Limitação"/>
+      </div>
+      {{/if}}
+      {{/if}}
+
+      {{#if (eq item.type "arma")}}
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{localize "CDT.Categoria"}}</label>
+          <select name="system.categoria">
+            <option value="corpo-a-corpo" {{selected "corpo-a-corpo" system.categoria}}>{{localize "CDT.CorpoACorpo"}}</option>
+            <option value="a-distancia" {{selected "a-distancia" system.categoria}}>{{localize "CDT.ADistancia"}}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{{localize "CDT.Tipo"}}</label>
+          <select name="system.tipo">
+            <option value="leve" {{selected "leve" system.tipo}}>{{localize "CDT.Leve"}}</option>
+            <option value="media" {{selected "media" system.tipo}}>{{localize "CDT.Media"}}</option>
+            <option value="pesada" {{selected "pesada" system.tipo}}>{{localize "CDT.Pesada"}}</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{localize "CDT.Dano"}}</label>
+          <input type="text" name="system.dano" value="{{system.dano}}" placeholder="1d6"/>
+        </div>
+        <div class="form-group">
+          <label>{{localize "CDT.Alcance"}}</label>
+          <input type="text" name="system.alcance" value="{{system.alcance}}" placeholder="1.5m"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>{{localize "CDT.Propriedades"}}</label>
+        <input type="text" name="system.propriedades" value="{{join system.propriedades ', '}}" placeholder="Propriedades especiais"/>
+      </div>
+      {{#if (eq system.categoria "a-distancia")}}
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{localize "CDT.Municao"}}</label>
+          <input type="number" name="system.municao" value="{{system.municao}}" min="0"/>
+        </div>
+        <div class="form-group">
+          <label>Munição Máxima</label>
+          <input type="number" name="system.municaoMax" value="{{system.municaoMax}}" min="0"/>
+        </div>
+      </div>
+      {{/if}}
+      {{/if}}
+
+      {{#if (eq item.type "armadura")}}
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{localize "CDT.Categoria"}}</label>
+          <select name="system.categoria">
+            <option value="leve" {{selected "leve" system.categoria}}>{{localize "CDT.Leve"}}</option>
+            <option value="media" {{selected "media" system.categoria}}>{{localize "CDT.Media"}}</option>
+            <option value="pesada" {{selected "pesada" system.categoria}}>{{localize "CDT.Pesada"}}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{{localize "CDT.Defesa"}}</label>
+          <input type="number" name="system.defesa" value="{{system.defesa}}" min="0"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{localize "CDT.Protecao"}}</label>
+          <input type="number" name="system.protecao" value="{{system.protecao}}" min="0"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>{{localize "CDT.Penalidades"}}</label>
+        <div class="form-fields">
+          <label>{{localize "CDT.Furtividade"}}: <input type="number" name="system.penalidades.furtividade" value="{{system.penalidades.furtividade}}" min="0"/></label>
+          <label>{{localize "CDT.Acao"}}: <input type="number" name="system.penalidades.acao" value="{{system.penalidades.acao}}" min="0"/></label>
+        </div>
+      </div>
+      {{/if}}
+
+      {{#if (eq item.type "pocao")}}
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{localize "CDT.Tipo"}}</label>
+          <select name="system.tipo">
+            <option value="cura" {{selected "cura" system.tipo}}>{{localize "CDT.Cura"}}</option>
+            <option value="pm" {{selected "pm" system.tipo}}>{{localize "CDT.PM"}}</option>
+            <option value="atributo" {{selected "atributo" system.tipo}}>{{localize "CDT.Atributo"}}</option>
+            <option value="especial" {{selected "especial" system.tipo}}>Especial</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{{localize "CDT.Duracao"}}</label>
+          <input type="text" name="system.duracao" value="{{system.duracao}}" placeholder="Duração"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>{{localize "CDT.Efeito"}}</label>
+        <textarea name="system.efeito" placeholder="Efeito da poção">{{system.efeito}}</textarea>
+      </div>
+      <div class="form-group">
+        <label>{{localize "CDT.Recuperacao"}}</label>
+        <input type="text" name="system.recuperacao" value="{{system.recuperacao}}" placeholder="Recuperação (ex: 2d6 PV)"/>
+      </div>
+      {{#if system.limitacao}}
+      <div class="form-group">
+        <label>{{localize "CDT.Limitacao"}}</label>
+        <input type="text" name="system.limitacao" value="{{system.limitacao}}" placeholder="Limitação"/>
+      </div>
+      {{/if}}
+      {{/if}}
+
+      {{#if (eq item.type "equipamento")}}
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{localize "CDT.Categoria"}}</label>
+          <input type="text" name="system.categoria" value="{{system.categoria}}" placeholder="Categoria"/>
+        </div>
+        <div class="form-group">
+          <label>{{localize "CDT.Quantidade"}}</label>
+          <input type="number" name="system.quantidade" value="{{system.quantidade}}" min="1"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{localize "CDT.Consumivel"}}</label>
+          <input type="checkbox" name="system.consumivel" {{checked system.consumivel}}/>
+        </div>
+      </div>
+      {{#if system.efeito}}
+      <div class="form-group">
+        <label>{{localize "CDT.Efeito"}}</label>
+        <textarea name="system.efeito" placeholder="Efeito especial">{{system.efeito}}</textarea>
+      </div>
+      {{/if}}
+      {{/if}}
+
+    </div>
+  </section>
+</form>
+

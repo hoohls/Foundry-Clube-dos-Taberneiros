@@ -1,0 +1,171 @@
+[
+  {
+    "name": "Combate com Armas Brancas",
+    "type": "habilidade",
+    "img": "icons/weapons/swords/sword-broad-steel.webp",
+    "system": {
+      "descricao": "Conhecimento e treinamento no uso de armas corpo a corpo como espadas, machados e lanças.",
+      "categoria": "combate",
+      "atributo": "fisico",
+      "bonus": 2,
+      "prerequisitos": "",
+      "efeito": "Adiciona +2 em testes de ataque corpo a corpo",
+      "passiva": false,
+      "preco": {
+        "valor": 0,
+        "moeda": "MP"
+      },
+      "peso": 0,
+      "raridade": "comum",
+      "nivelMinimo": 1
+    }
+  },
+  {
+    "name": "Furtividade",
+    "type": "habilidade",
+    "img": "icons/magic/perception/shadow-stealth-eyes-purple.webp",
+    "system": {
+      "descricao": "Capacidade de mover-se silenciosamente e permanecer oculto.",
+      "categoria": "gerais",
+      "atributo": "acao",
+      "bonus": 2,
+      "prerequisitos": "",
+      "efeito": "Adiciona +2 em testes de furtividade e ocultação",
+      "passiva": false,
+      "preco": {
+        "valor": 0,
+        "moeda": "MP"
+      },
+      "peso": 0,
+      "raridade": "comum",
+      "nivelMinimo": 1
+    }
+  },
+  {
+    "name": "Conhecimento Arcano",
+    "type": "habilidade",
+    "img": "icons/magic/symbols/runes-star-pentagon-blue.webp",
+    "system": {
+      "descricao": "Conhecimento sobre magia, criaturas mágicas e fenômenos sobrenaturais.",
+      "categoria": "magicas",
+      "atributo": "mental",
+      "bonus": 2,
+      "prerequisitos": "",
+      "efeito": "Adiciona +2 em testes relacionados a conhecimento mágico",
+      "passiva": false,
+      "preco": {
+        "valor": 0,
+        "moeda": "MP"
+      },
+      "peso": 0,
+      "raridade": "comum",
+      "nivelMinimo": 1
+    }
+  },
+  {
+    "name": "Persuasão",
+    "type": "habilidade",
+    "img": "icons/magic/control/mouth-smile-deception-purple.webp",
+    "system": {
+      "descricao": "Capacidade de convencer outros através de argumentos e carisma.",
+      "categoria": "sociais",
+      "atributo": "social",
+      "bonus": 2,
+      "prerequisitos": "",
+      "efeito": "Adiciona +2 em testes de persuasão e negociação",
+      "passiva": false,
+      "preco": {
+        "valor": 0,
+        "moeda": "MP"
+      },
+      "peso": 0,
+      "raridade": "comum",
+      "nivelMinimo": 1
+    }
+  },
+  {
+    "name": "Desarmar Armadilhas",
+    "type": "habilidade",
+    "img": "icons/tools/hand/lockpicks-steel-grey.webp",
+    "system": {
+      "descricao": "Conhecimento para detectar e desarmar armadilhas mecânicas.",
+      "categoria": "gerais",
+      "atributo": "acao",
+      "bonus": 2,
+      "prerequisitos": "",
+      "efeito": "Adiciona +2 em testes para desarmar armadilhas",
+      "passiva": false,
+      "preco": {
+        "valor": 0,
+        "moeda": "MP"
+      },
+      "peso": 0,
+      "raridade": "comum",
+      "nivelMinimo": 1
+    }
+  },
+  {
+    "name": "Intimidação",
+    "type": "habilidade",
+    "img": "icons/magic/control/fear-fright-monster-grin-red.webp",
+    "system": {
+      "descricao": "Capacidade de amedrontar e coagir outros através de presença intimidadora.",
+      "categoria": "sociais",
+      "atributo": "social",
+      "bonus": 2,
+      "prerequisitos": "",
+      "efeito": "Adiciona +2 em testes de intimidação",
+      "passiva": false,
+      "preco": {
+        "valor": 0,
+        "moeda": "MP"
+      },
+      "peso": 0,
+      "raridade": "comum",
+      "nivelMinimo": 1
+    }
+  },
+  {
+    "name": "Primeiros Socorros",
+    "type": "habilidade",
+    "img": "icons/magic/life/heart-cross-strong-flame.webp",
+    "system": {
+      "descricao": "Conhecimento básico de medicina para tratar ferimentos.",
+      "categoria": "gerais",
+      "atributo": "mental",
+      "bonus": 2,
+      "prerequisitos": "",
+      "efeito": "Permite curar 1d6 PV com kit de primeiros socorros",
+      "passiva": false,
+      "preco": {
+        "valor": 0,
+        "moeda": "MP"
+      },
+      "peso": 0,
+      "raridade": "comum",
+      "nivelMinimo": 1
+    }
+  },
+  {
+    "name": "Combate à Distância",
+    "type": "habilidade",
+    "img": "icons/weapons/bows/bow-recurve-brown.webp",
+    "system": {
+      "descricao": "Treinamento no uso de armas de projétil como arcos e bestas.",
+      "categoria": "combate",
+      "atributo": "acao",
+      "bonus": 2,
+      "prerequisitos": "",
+      "efeito": "Adiciona +2 em testes de ataque à distância",
+      "passiva": false,
+      "preco": {
+        "valor": 0,
+        "moeda": "MP"
+      },
+      "peso": 0,
+      "raridade": "comum",
+      "nivelMinimo": 1
+    }
+  }
+]
+

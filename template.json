@@ -1,0 +1,176 @@
+{
+  "Actor": {
+    "types": ["personagem", "npc", "criatura"],
+    "templates": {
+      "base": {
+        "pv": {
+          "value": 10,
+          "max": 10
+        },
+        "pm": {
+          "value": 5,
+          "max": 5
+        },
+        "defesa": {
+          "value": 10,
+          "base": 10,
+          "armadura": 0,
+          "escudo": 0,
+          "outros": 0
+        },
+        "nivel": {
+          "value": 1,
+          "xp": 0,
+          "xpProximo": 10
+        },
+        "detalhes": {
+          "biografia": "",
+          "aparencia": "",
+          "personalidade": "",
+          "historia": ""
+        }
+      },
+      "atributos": {
+        "fisico": {
+          "value": 4,
+          "mod": 0
+        },
+        "acao": {
+          "value": 4,
+          "mod": 0
+        },
+        "mental": {
+          "value": 4,
+          "mod": 0
+        },
+        "social": {
+          "value": 4,
+          "mod": 0
+        }
+      }
+    },
+    "personagem": {
+      "templates": ["base", "atributos"],
+      "raca": "",
+      "classe": "",
+      "antecedente": "",
+      "recursos": {
+        "moedas": {
+          "cobre": 0,
+          "prata": 0,
+          "ouro": 0
+        },
+        "carga": {
+          "atual": 0,
+          "max": 40
+        }
+      },
+      "progressao": {
+        "pontosAtributo": 0,
+        "pontosHabilidade": 0
+      }
+    },
+    "npc": {
+      "templates": ["base", "atributos"],
+      "tipo": "humanoid",
+      "categoria": "plebeu",
+      "profissao": "",
+      "motivacao": "",
+      "segredos": ""
+    },
+    "criatura": {
+      "templates": ["base"],
+      "tipo": "beast",
+      "tamanho": "medium",
+      "habitat": "",
+      "comportamento": "",
+      "tesouro": ""
+    }
+  },
+  "Item": {
+    "types": ["habilidade", "magia", "arma", "armadura", "escudo", "equipamento", "pocao"],
+    "templates": {
+      "base": {
+        "descricao": "",
+        "preco": {
+          "valor": 0,
+          "moeda": "MP"
+        },
+        "peso": 0,
+        "raridade": "comum",
+        "nivelMinimo": 1
+      },
+      "equipavel": {
+        "equipado": false,
+        "slot": ""
+      }
+    },
+    "habilidade": {
+      "templates": ["base"],
+      "categoria": "geral",
+      "atributo": "fisico",
+      "bonus": 0,
+      "prerequisitos": "",
+      "efeito": "",
+      "passiva": false
+    },
+    "magia": {
+      "templates": ["base"],
+      "escola": "evocacao",
+      "nivel": 1,
+      "custoMP": 1,
+      "alcance": "toque",
+      "duracao": "instantaneo",
+      "componentes": {
+        "verbal": true,
+        "somatico": true,
+        "material": false,
+        "materialDescricao": ""
+      },
+      "limitacao": "",
+      "dano": "",
+      "nd": 0
+    },
+    "arma": {
+      "templates": ["base", "equipavel"],
+      "categoria": "corpo-a-corpo",
+      "tipo": "leve",
+      "dano": "1d6",
+      "alcance": "1.5m",
+      "propriedades": [],
+      "municao": 0,
+      "municaoMax": 0
+    },
+    "armadura": {
+      "templates": ["base", "equipavel"],
+      "categoria": "leve",
+      "protecao": 0,
+      "defesa": 0,
+      "penalidades": {
+        "furtividade": 0,
+        "acao": 0
+      }
+    },
+    "escudo": {
+      "templates": ["base", "equipavel"],
+      "defesa": 1,
+      "propriedades": []
+    },
+    "equipamento": {
+      "templates": ["base"],
+      "categoria": "geral",
+      "quantidade": 1,
+      "consumivel": false,
+      "efeito": ""
+    },
+    "pocao": {
+      "templates": ["base"],
+      "tipo": "cura",
+      "efeito": "",
+      "duracao": "instantaneo",
+      "limitacao": "",
+      "recuperacao": ""
+    }
+  }
+}
+

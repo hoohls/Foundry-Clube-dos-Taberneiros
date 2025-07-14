@@ -1,0 +1,195 @@
+[
+  {
+    "name": "Punhal",
+    "type": "arma",
+    "img": "icons/weapons/daggers/dagger-straight-steel.webp",
+    "system": {
+      "descricao": "Uma lâmina curta e afiada, ideal para combate próximo e furtividade.",
+      "categoria": "corpo-a-corpo",
+      "tipo": "leve",
+      "dano": "1d4",
+      "alcance": "1.5m",
+      "propriedades": ["Leve", "Arremesso"],
+      "municao": 0,
+      "municaoMax": 0,
+      "equipado": false,
+      "slot": "mao-principal",
+      "preco": {
+        "valor": 1,
+        "moeda": "MP"
+      },
+      "peso": 0.5,
+      "raridade": "comum",
+      "nivelMinimo": 1
+    }
+  },
+  {
+    "name": "Espada Longa",
+    "type": "arma",
+    "img": "icons/weapons/swords/sword-broad-steel.webp",
+    "system": {
+      "descricao": "Uma espada versátil e equilibrada, favorita de guerreiros experientes.",
+      "categoria": "corpo-a-corpo",
+      "tipo": "media",
+      "dano": "1d8",
+      "alcance": "1.5m",
+      "propriedades": ["Versátil"],
+      "municao": 0,
+      "municaoMax": 0,
+      "equipado": false,
+      "slot": "mao-principal",
+      "preco": {
+        "valor": 25,
+        "moeda": "MP"
+      },
+      "peso": 1.5,
+      "raridade": "comum",
+      "nivelMinimo": 1
+    }
+  },
+  {
+    "name": "Montante",
+    "type": "arma",
+    "img": "icons/weapons/swords/sword-guard-steel.webp",
+    "system": {
+      "descricao": "Uma espada grande e poderosa que requer duas mãos para empunhar.",
+      "categoria": "corpo-a-corpo",
+      "tipo": "pesada",
+      "dano": "2d6",
+      "alcance": "1.5m",
+      "propriedades": ["Duas mãos", "Pesada"],
+      "municao": 0,
+      "municaoMax": 0,
+      "equipado": false,
+      "slot": "duas-maos",
+      "preco": {
+        "valor": 60,
+        "moeda": "MP"
+      },
+      "peso": 3,
+      "raridade": "comum",
+      "nivelMinimo": 2
+    }
+  },
+  {
+    "name": "Arco Simples",
+    "type": "arma",
+    "img": "icons/weapons/bows/bow-simple-leather.webp",
+    "system": {
+      "descricao": "Um arco básico de madeira, ideal para caçadores iniciantes.",
+      "categoria": "a-distancia",
+      "tipo": "leve",
+      "dano": "1d6",
+      "alcance": "45/90/180m",
+      "propriedades": ["Duas mãos", "Munição"],
+      "municao": 20,
+      "municaoMax": 20,
+      "equipado": false,
+      "slot": "duas-maos",
+      "preco": {
+        "valor": 10,
+        "moeda": "MP"
+      },
+      "peso": 1,
+      "raridade": "comum",
+      "nivelMinimo": 1
+    }
+  },
+  {
+    "name": "Arco Longo",
+    "type": "arma",
+    "img": "icons/weapons/bows/bow-recurve-brown.webp",
+    "system": {
+      "descricao": "Um arco poderoso com maior alcance e precisão.",
+      "categoria": "a-distancia",
+      "tipo": "media",
+      "dano": "1d8",
+      "alcance": "60/120/240m",
+      "propriedades": ["Duas mãos", "Munição", "Pesada"],
+      "municao": 20,
+      "municaoMax": 20,
+      "equipado": false,
+      "slot": "duas-maos",
+      "preco": {
+        "valor": 40,
+        "moeda": "MP"
+      },
+      "peso": 1.5,
+      "raridade": "comum",
+      "nivelMinimo": 2
+    }
+  },
+  {
+    "name": "Besta Leve",
+    "type": "arma",
+    "img": "icons/weapons/crossbows/crossbow-simple-wood.webp",
+    "system": {
+      "descricao": "Uma besta compacta e fácil de usar, ideal para iniciantes.",
+      "categoria": "a-distancia",
+      "tipo": "leve",
+      "dano": "1d8",
+      "alcance": "40/80/120m",
+      "propriedades": ["Munição", "Carregamento"],
+      "municao": 10,
+      "municaoMax": 10,
+      "equipado": false,
+      "slot": "mao-principal",
+      "preco": {
+        "valor": 25,
+        "moeda": "MP"
+      },
+      "peso": 2,
+      "raridade": "comum",
+      "nivelMinimo": 1
+    }
+  },
+  {
+    "name": "Machado de Guerra",
+    "type": "arma",
+    "img": "icons/weapons/axes/axe-battle-worn.webp",
+    "system": {
+      "descricao": "Um machado robusto projetado para combate, favorito dos anões.",
+      "categoria": "corpo-a-corpo",
+      "tipo": "media",
+      "dano": "1d8",
+      "alcance": "1.5m",
+      "propriedades": ["Versátil"],
+      "municao": 0,
+      "municaoMax": 0,
+      "equipado": false,
+      "slot": "mao-principal",
+      "preco": {
+        "valor": 30,
+        "moeda": "MP"
+      },
+      "peso": 2,
+      "raridade": "comum",
+      "nivelMinimo": 1
+    }
+  },
+  {
+    "name": "Lâmina Flamejante",
+    "type": "arma",
+    "img": "icons/weapons/swords/sword-flame-orange.webp",
+    "system": {
+      "descricao": "Uma espada mágica que emana chamas, causando dano adicional de fogo.",
+      "categoria": "corpo-a-corpo",
+      "tipo": "media",
+      "dano": "1d8+1d4 fogo",
+      "alcance": "1.5m",
+      "propriedades": ["Mágica", "Flamejante"],
+      "municao": 0,
+      "municaoMax": 0,
+      "equipado": false,
+      "slot": "mao-principal",
+      "preco": {
+        "valor": 500,
+        "moeda": "MP"
+      },
+      "peso": 1.5,
+      "raridade": "raro",
+      "nivelMinimo": 4
+    }
+  }
+]
+

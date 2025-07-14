@@ -1,0 +1,127 @@
+{
+  "id": "clube-dos-taberneiros",
+  "title": "Clube dos Taberneiros",
+  "description": "Sistema 2d6 focado em narrativa e simplicidade para Foundry VTT",
+  "version": "1.0.1",
+  "compatibility": {
+    "minimum": "11",
+    "verified": "13",
+    "maximum": "13"
+  },
+  "authors": [
+    {
+      "name": "hoohls",
+      "url": "https://github.com/hoohls",
+      "discord": "hoohls"
+    }
+  ],
+  "esmodules": [
+    "module/clube-dos-taberneiros.mjs"
+  ],
+  "styles": [
+    "styles/clube-dos-taberneiros.css"
+  ],
+  "documentTypes": {
+    "Actor": {
+      "personagem": {
+        "htmlFields": [
+          "detalhes.biografia",
+          "detalhes.aparencia", 
+          "detalhes.personalidade",
+          "detalhes.historia"
+        ]
+      },
+      "npc": {
+        "htmlFields": [
+          "detalhes.biografia"
+        ]
+      },
+      "criatura": {
+        "htmlFields": [
+          "detalhes.biografia"
+        ]
+      }
+    },
+    "Item": {
+      "habilidade": {
+        "htmlFields": ["descricao"]
+      },
+      "magia": {
+        "htmlFields": ["descricao"]
+      },
+      "arma": {
+        "htmlFields": ["descricao"]
+      },
+      "armadura": {
+        "htmlFields": ["descricao"]
+      },
+      "equipamento": {
+        "htmlFields": ["descricao"]
+      }
+    }
+  },
+  "languages": [
+    {
+      "lang": "pt-BR",
+      "name": "Português (Brasil)",
+      "path": "lang/pt-BR.json"
+    }
+  ],
+  "packs": [
+    {
+      "name": "habilidades",
+      "label": "Habilidades",
+      "path": "packs/habilidades-sample.json",
+      "type": "Item",
+      "system": "clube-dos-taberneiros",
+      "private": false
+    },
+    {
+      "name": "magias",
+      "label": "Magias",
+      "path": "packs/magias-sample.json",
+      "type": "Item",
+      "system": "clube-dos-taberneiros",
+      "private": false
+    },
+    {
+      "name": "armas",
+      "label": "Armas",
+      "path": "packs/armas-sample.json",
+      "type": "Item",
+      "system": "clube-dos-taberneiros",
+      "private": false
+    }
+  ],
+  "packFolders": [
+    {
+      "name": "Clube dos Taberneiros",
+      "sorting": "m",
+      "color": "#8B4513",
+      "packs": ["habilidades", "magias", "armas"],
+      "folders": []
+    }
+  ],
+  "socket": false,
+  "initiative": "2d6 + @attributes.acao.value",
+  "grid": {
+    "distance": 1.5,
+    "units": "m"
+  },
+  "primaryTokenAttribute": "pv",
+  "secondaryTokenAttribute": "pm",
+  "url": "https://github.com/hoohls/clube-dos-taberneiros-foundry",
+  "manifest": "https://raw.githubusercontent.com/hoohls/clube-dos-taberneiros-foundry/main/system.json",
+  "download": "https://github.com/hoohls/clube-dos-taberneiros-foundry/archive/refs/heads/main.zip",
+  "bugs": "https://github.com/hoohls/clube-dos-taberneiros-foundry/issues",
+  "changelog": "https://github.com/hoohls/clube-dos-taberneiros-foundry/releases",
+  "license": "MIT",
+  "readme": "https://github.com/hoohls/clube-dos-taberneiros-foundry/blob/main/README.md",
+  "media": [
+    {
+      "type": "icon",
+      "url": "https://raw.githubusercontent.com/hoohls/clube-dos-taberneiros-foundry/main/assets/icon.png"
+    }
+  ]
+}
+

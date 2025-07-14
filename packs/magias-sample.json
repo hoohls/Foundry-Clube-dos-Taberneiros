@@ -1,0 +1,235 @@
+[
+  {
+    "name": "Rajada Arcana",
+    "type": "magia",
+    "img": "icons/magic/air/wind-tornado-wall-blue.webp",
+    "system": {
+      "descricao": "Uma rajada de energia mágica que atinge um único alvo.",
+      "escola": "evocacao",
+      "nivel": 1,
+      "custoMP": 1,
+      "alcance": "30m",
+      "duracao": "Instantâneo",
+      "dano": "1d6",
+      "nd": 6,
+      "componentes": {
+        "verbal": true,
+        "somatico": true,
+        "material": false,
+        "materialDescricao": ""
+      },
+      "limitacao": "",
+      "preco": {
+        "valor": 0,
+        "moeda": "MP"
+      },
+      "peso": 0,
+      "raridade": "comum",
+      "nivelMinimo": 1
+    }
+  },
+  {
+    "name": "Detectar Magia",
+    "type": "magia",
+    "img": "icons/magic/perception/eye-ringed-glow-yellow.webp",
+    "system": {
+      "descricao": "Permite detectar a presença de magia em um raio de 9 metros.",
+      "escola": "divinacao",
+      "nivel": 1,
+      "custoMP": 1,
+      "alcance": "9m raio",
+      "duracao": "10 minutos",
+      "dano": "",
+      "nd": 6,
+      "componentes": {
+        "verbal": true,
+        "somatico": true,
+        "material": false,
+        "materialDescricao": ""
+      },
+      "limitacao": "",
+      "preco": {
+        "valor": 0,
+        "moeda": "MP"
+      },
+      "peso": 0,
+      "raridade": "comum",
+      "nivelMinimo": 1
+    }
+  },
+  {
+    "name": "Mísseis Mágicos",
+    "type": "magia",
+    "img": "icons/magic/air/air-burst-spiral-blue-gray.webp",
+    "system": {
+      "descricao": "Cria 3 projéteis de energia que atingem automaticamente os alvos.",
+      "escola": "evocacao",
+      "nivel": 2,
+      "custoMP": 3,
+      "alcance": "60m",
+      "duracao": "Instantâneo",
+      "dano": "3 × 1d4+1",
+      "nd": 7,
+      "componentes": {
+        "verbal": true,
+        "somatico": true,
+        "material": false,
+        "materialDescricao": ""
+      },
+      "limitacao": "",
+      "preco": {
+        "valor": 0,
+        "moeda": "MP"
+      },
+      "peso": 0,
+      "raridade": "comum",
+      "nivelMinimo": 2
+    }
+  },
+  {
+    "name": "Escudo Arcano",
+    "type": "magia",
+    "img": "icons/magic/defensive/shield-barrier-flaming-pentagon-blue.webp",
+    "system": {
+      "descricao": "Cria um escudo mágico que fornece +2 de Defesa.",
+      "escola": "abjuracao",
+      "nivel": 2,
+      "custoMP": 3,
+      "alcance": "Pessoal",
+      "duracao": "1 hora",
+      "dano": "",
+      "nd": 7,
+      "componentes": {
+        "verbal": true,
+        "somatico": true,
+        "material": false,
+        "materialDescricao": ""
+      },
+      "limitacao": "",
+      "preco": {
+        "valor": 0,
+        "moeda": "MP"
+      },
+      "peso": 0,
+      "raridade": "comum",
+      "nivelMinimo": 2
+    }
+  },
+  {
+    "name": "Cura Menor",
+    "type": "magia",
+    "img": "icons/magic/life/heart-cross-strong-flame.webp",
+    "system": {
+      "descricao": "Restaura pontos de vida do alvo tocado.",
+      "escola": "necromancia",
+      "nivel": 2,
+      "custoMP": 2,
+      "alcance": "Toque",
+      "duracao": "Instantâneo",
+      "dano": "",
+      "nd": 7,
+      "componentes": {
+        "verbal": true,
+        "somatico": true,
+        "material": false,
+        "materialDescricao": ""
+      },
+      "limitacao": "",
+      "preco": {
+        "valor": 0,
+        "moeda": "MP"
+      },
+      "peso": 0,
+      "raridade": "comum",
+      "nivelMinimo": 2
+    }
+  },
+  {
+    "name": "Bola de Fogo",
+    "type": "magia",
+    "img": "icons/magic/fire/projectile-fireball-orange-red.webp",
+    "system": {
+      "descricao": "Uma explosão de fogo que causa dano em área.",
+      "escola": "evocacao",
+      "nivel": 3,
+      "custoMP": 5,
+      "alcance": "45m",
+      "duracao": "Instantâneo",
+      "dano": "6d6",
+      "nd": 8,
+      "componentes": {
+        "verbal": true,
+        "somatico": true,
+        "material": true,
+        "materialDescricao": "Uma pequena esfera de enxofre"
+      },
+      "limitacao": "",
+      "preco": {
+        "valor": 0,
+        "moeda": "MP"
+      },
+      "peso": 0,
+      "raridade": "incomum",
+      "nivelMinimo": 3
+    }
+  },
+  {
+    "name": "Invisibilidade",
+    "type": "magia",
+    "img": "icons/magic/perception/shadow-stealth-eyes-purple.webp",
+    "system": {
+      "descricao": "Torna o alvo invisível por um período limitado.",
+      "escola": "ilusao",
+      "nivel": 3,
+      "custoMP": 5,
+      "alcance": "Toque",
+      "duracao": "10 minutos",
+      "dano": "",
+      "nd": 8,
+      "componentes": {
+        "verbal": true,
+        "somatico": true,
+        "material": true,
+        "materialDescricao": "Uma pena ou pelo de animal"
+      },
+      "limitacao": "Termina se atacar ou conjurar magia",
+      "preco": {
+        "valor": 0,
+        "moeda": "MP"
+      },
+      "peso": 0,
+      "raridade": "incomum",
+      "nivelMinimo": 3
+    }
+  },
+  {
+    "name": "Cataclismo",
+    "type": "magia",
+    "img": "icons/magic/fire/explosion-fireball-large-orange.webp",
+    "system": {
+      "descricao": "Uma devastação mágica massiva que afeta uma grande área.",
+      "escola": "evocacao",
+      "nivel": 6,
+      "custoMP": 12,
+      "alcance": "150m",
+      "duracao": "Instantâneo",
+      "dano": "12d6",
+      "nd": 11,
+      "componentes": {
+        "verbal": true,
+        "somatico": true,
+        "material": true,
+        "materialDescricao": "Um cristal de poder no valor de 1000 MP"
+      },
+      "limitacao": "1×/dia",
+      "preco": {
+        "valor": 0,
+        "moeda": "MP"
+      },
+      "peso": 0,
+      "raridade": "lendario",
+      "nivelMinimo": 8
+    }
+  }
+]
+
