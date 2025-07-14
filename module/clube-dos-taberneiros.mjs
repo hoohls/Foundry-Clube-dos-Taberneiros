@@ -115,21 +115,90 @@ function _registerHandlebarsHelpers() {
 Hooks.on("createActor", (actor, options, userId) => {
   if (actor.type === "personagem") {
     // Calcular valores derivados iniciais com validação
-    const updates = _calculateDerivedValues(actor.system);
+    const updates = _initializeCharacterValues(actor.system);
     if (Object.keys(updates).length > 0) {
       actor.update(updates, { skipDerivedCalculation: true });
     }
   }
 });
 
+/**
+ * Inicializar valores derivados para novo personagem
+ */
+function _initializeCharacterValues(system) {
+  const updates = {};
+  
+  try {
+    // Inicializar atributos se não definidos
+    ['fisico', 'acao', 'mental', 'social'].forEach(attr => {
+      if (!system[attr] || system[attr].value === undefined) {
+        updates[`system.${attr}.value`] = 4;
+      }
+    });
+
+    // Calcular PV máximo inicial
+    const fisicoValue = system.fisico?.value || 4;
+    const pvMax = Math.max(1, fisicoValue * 3 + 10);
+    updates["system.pv.max"] = pvMax;
+    updates["system.pv.value"] = pvMax;
+    
+    // Calcular PM máximo inicial
+    const mentalValue = system.mental?.value || 4;
+    const pmMax = Math.max(0, mentalValue * 2 + 5);
+    updates["system.pm.max"] = pmMax;
+    updates["system.pm.value"] = pmMax;
+    
+    // Calcular Defesa inicial
+    const acaoValue = system.acao?.value || 4;
+    updates["system.defesa.value"] = 10 + acaoValue;
+    updates["system.defesa.base"] = 10;
+    updates["system.defesa.armadura"] = 0;
+    updates["system.defesa.escudo"] = 0;
+    updates["system.defesa.outros"] = 0;
+
+    // Inicializar estruturas de recursos
+    if (!system.recursos) {
+      updates["system.recursos"] = {
+        moedas: { cobre: 0, prata: 0, ouro: 0 },
+        carga: { atual: 0, max: 40 }
+      };
+    }
+
+    // Inicializar progressão
+    if (!system.progressao) {
+      updates["system.progressao"] = {
+        pontosAtributo: 0,
+        pontosHabilidade: 0
+      };
+    }
+
+    // Inicializar nível e XP
+    if (!system.nivel) {
+      updates["system.nivel"] = {
+        value: 1,
+        xp: 0,
+        xpProximo: 10
+      };
+    }
+
+  } catch (error) {
+    console.error("Clube dos Taberneiros | Erro na inicialização de valores:", error);
+  }
+
+  return updates;
+}
+
 // Hook melhorado para atualizações de ator
 Hooks.on("updateActor", (actor, changes, options, userId) => {
-  if (actor.type === "personagem" && !options.skipDerivedCalculation) {
-    const updates = _calculateDerivedValues(actor.system, changes);
-    
-    if (Object.keys(updates).length > 0) {
-      actor.update(updates, { skipDerivedCalculation: true });
-    }
+  if (actor.type === "personagem" && !options.skipDerivedCalculation && !options.fromUserInput) {
+    // Aguardar um pouco para permitir que inputs do usuário sejam processados primeiro
+    setTimeout(() => {
+      const updates = _calculateDerivedValues(actor.system, changes);
+      
+      if (Object.keys(updates).length > 0) {
+        actor.update(updates, { skipDerivedCalculation: true });
+      }
+    }, 100);
   }
 });
 
@@ -160,16 +229,16 @@ function _calculateDerivedValues(system, changes = {}) {
   const updates = {};
   
   try {
-    // Garantir valores mínimos para atributos
+    // Garantir valores mínimos para atributos APENAS se o valor foi especificamente alterado
     ['fisico', 'acao', 'mental', 'social'].forEach(attr => {
-      if (system[attr] && system[attr].value < 1) {
+      if (changes.system?.[attr]?.value !== undefined && changes.system[attr].value < 1) {
         updates[`system.${attr}.value`] = 1;
       }
     });
 
-    // Recalcular PV máximo se Físico mudou ou está indefinido
-    if (changes.system?.fisico?.value || !system.pv?.max) {
-      const fisicoValue = changes.system?.fisico?.value || system.fisico?.value || 4;
+    // Recalcular PV máximo APENAS se Físico mudou especificamente
+    if (changes.system?.fisico?.value !== undefined) {
+      const fisicoValue = changes.system.fisico.value;
       const newPvMax = Math.max(1, fisicoValue * 3 + 10);
       updates["system.pv.max"] = newPvMax;
       
@@ -179,9 +248,9 @@ function _calculateDerivedValues(system, changes = {}) {
       }
     }
     
-    // Recalcular PM máximo se Mental mudou ou está indefinido
-    if (changes.system?.mental?.value || !system.pm?.max) {
-      const mentalValue = changes.system?.mental?.value || system.mental?.value || 4;
+    // Recalcular PM máximo APENAS se Mental mudou especificamente
+    if (changes.system?.mental?.value !== undefined) {
+      const mentalValue = changes.system.mental.value;
       const newPmMax = Math.max(0, mentalValue * 2 + 5);
       updates["system.pm.max"] = newPmMax;
       
@@ -191,9 +260,9 @@ function _calculateDerivedValues(system, changes = {}) {
       }
     }
     
-    // Recalcular Defesa se Ação mudou ou está indefinida
-    if (changes.system?.acao?.value || !system.defesa?.value) {
-      const acaoValue = changes.system?.acao?.value || system.acao?.value || 4;
+    // Recalcular Defesa APENAS se Ação mudou especificamente
+    if (changes.system?.acao?.value !== undefined) {
+      const acaoValue = changes.system.acao.value;
       const armaduraBonus = system.defesa?.armadura || 0;
       const escudoBonus = system.defesa?.escudo || 0;
       const outrosBonus = system.defesa?.outros || 0;
@@ -201,20 +270,8 @@ function _calculateDerivedValues(system, changes = {}) {
       updates["system.defesa.value"] = 10 + acaoValue + armaduraBonus + escudoBonus + outrosBonus;
     }
 
-    // Inicializar estruturas se não existirem
-    if (!system.recursos) {
-      updates["system.recursos"] = {
-        moedas: { cobre: 0, prata: 0, ouro: 0 },
-        carga: { atual: 0, max: 40 }
-      };
-    }
-
-    if (!system.progressao) {
-      updates["system.progressao"] = {
-        pontosAtributo: 0,
-        pontosHabilidade: 0
-      };
-    }
+    // Não inicializar estruturas durante updates normais
+    // (isso é feito apenas na criação do personagem)
 
   } catch (error) {
     console.error("Clube dos Taberneiros | Erro no cálculo de valores derivados:", error);

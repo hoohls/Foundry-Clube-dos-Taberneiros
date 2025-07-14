@@ -69,6 +69,18 @@ export class TaberneiroPersonagemSheet extends ActorSheet {
     // Listener para recursos rápidos
     html.find('.quick-rest').click(this._onQuickRest.bind(this));
     html.find('.long-rest').click(this._onLongRest.bind(this));
+
+    // Prevenir conflitos com inputs do usuário
+    html.find('input, textarea, select').on('focus', function() {
+      $(this).data('user-editing', true);
+    });
+
+    html.find('input, textarea, select').on('blur', function() {
+      $(this).removeData('user-editing');
+    });
+
+    // Adicionar debounce para inputs críticos (atributos, PV, PM)
+    html.find('input[name*="fisico"], input[name*="acao"], input[name*="mental"], input[name*="social"], input[name*="pv"], input[name*="pm"]').on('input', this._debounceInput.bind(this));
   }
 
   /**
@@ -564,5 +576,55 @@ export class TaberneiroPersonagemSheet extends ActorSheet {
   /** @override */
   _canDragDrop(selector) {
     return this.actor.isOwner;
+  }
+
+  /**
+   * Debounce para inputs críticos
+   */
+  _debounceInput(event) {
+    const input = event.currentTarget;
+    const name = input.name;
+    
+    // Limpar timeout anterior se existir
+    if (this._inputTimeout) {
+      clearTimeout(this._inputTimeout);
+    }
+    
+    // Criar novo timeout
+    this._inputTimeout = setTimeout(() => {
+      // Simular submit apenas para este campo
+      const formData = new FormData();
+      formData.append(name, input.value);
+      
+      const updateData = {};
+      updateData[name] = input.value;
+      
+      this.actor.update(updateData, { fromUserInput: true });
+    }, 300); // 300ms de delay
+  }
+
+  /** @override */
+  async _updateObject(event, formData) {
+    // Marcar que esta atualização vem de input do usuário
+    const options = { fromUserInput: true };
+    
+    // Verificar se estamos lidando com campos que não devem disparar cálculos derivados
+    const userInputFields = [
+      'name', 'system.raca', 'system.classe', 'system.antecedente',
+      'system.detalhes.aparencia', 'system.detalhes.personalidade', 
+      'system.detalhes.historia', 'system.detalhes.biografia',
+      'system.recursos.moedas.cobre', 'system.recursos.moedas.prata', 
+      'system.recursos.moedas.ouro'
+    ];
+
+    const isUserOnlyField = Object.keys(formData).some(key => 
+      userInputFields.some(field => key.startsWith(field))
+    );
+
+    if (isUserOnlyField) {
+      options.skipDerivedCalculation = true;
+    }
+
+    return super._updateObject(event, formData, options);
   }
 } 
