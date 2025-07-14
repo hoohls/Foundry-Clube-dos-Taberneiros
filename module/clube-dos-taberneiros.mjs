@@ -80,28 +80,92 @@ function _registerHandlebarsHelpers() {
 
   // Helper para capitalizar primeira letra
   Handlebars.registerHelper('capitalize', function(str) {
+    if (!str || typeof str !== 'string') return '';
     return str.charAt(0).toUpperCase() + str.slice(1);
   });
 
-  // Helpers matemáticos
+  // Helpers matemáticos seguros
   Handlebars.registerHelper('mult', function(a, b) {
-    return (a || 0) * (b || 0);
+    const numA = parseFloat(a) || 0;
+    const numB = parseFloat(b) || 0;
+    return numA * numB;
   });
 
   Handlebars.registerHelper('div', function(a, b) {
-    return b !== 0 ? (a || 0) / (b || 1) : 0;
+    const numA = parseFloat(a) || 0;
+    const numB = parseFloat(b) || 1;
+    return numB !== 0 ? numA / numB : 0;
   });
 
   Handlebars.registerHelper('lt', function(a, b) {
-    return (a || 0) < (b || 0);
+    const numA = parseFloat(a) || 0;
+    const numB = parseFloat(b) || 0;
+    return numA < numB;
   });
 
-  Handlebars.registerHelper('gte', function(a, b) {
-    return (a || 0) >= (b || 0);
+  Handlebars.registerHelper('lte', function(a, b) {
+    const numA = parseFloat(a) || 0;
+    const numB = parseFloat(b) || 0;
+    return numA <= numB;
   });
 
   Handlebars.registerHelper('gt', function(a, b) {
-    return (a || 0) > (b || 0);
+    const numA = parseFloat(a) || 0;
+    const numB = parseFloat(b) || 0;
+    return numA > numB;
+  });
+
+  Handlebars.registerHelper('gte', function(a, b) {
+    const numA = parseFloat(a) || 0;
+    const numB = parseFloat(b) || 0;
+    return numA >= numB;
+  });
+
+  // Helper para somar valores
+  Handlebars.registerHelper('add', function(a, b) {
+    const numA = parseFloat(a) || 0;
+    const numB = parseFloat(b) || 0;
+    return numA + numB;
+  });
+
+  // Helper para subtrair valores
+  Handlebars.registerHelper('sub', function(a, b) {
+    const numA = parseFloat(a) || 0;
+    const numB = parseFloat(b) || 0;
+    return numA - numB;
+  });
+
+  // Helper para verificar se um valor existe
+  Handlebars.registerHelper('exists', function(value) {
+    return value !== null && value !== undefined && value !== '';
+  });
+
+  // Helper para condicionais if/unless
+  Handlebars.registerHelper('ifCond', function(v1, operator, v2, options) {
+    switch (operator) {
+      case '==':
+        return (v1 == v2) ? options.fn(this) : options.inverse(this);
+      case '===':
+        return (v1 === v2) ? options.fn(this) : options.inverse(this);
+      case '!=':
+        return (v1 != v2) ? options.fn(this) : options.inverse(this);
+      case '!==':
+        return (v1 !== v2) ? options.fn(this) : options.inverse(this);
+      case '<':
+        return (v1 < v2) ? options.fn(this) : options.inverse(this);
+      case '<=':
+        return (v1 <= v2) ? options.fn(this) : options.inverse(this);
+      case '>':
+        return (v1 > v2) ? options.fn(this) : options.inverse(this);
+      case '>=':
+        return (v1 >= v2) ? options.fn(this) : options.inverse(this);
+      case '&&':
+        return (v1 && v2) ? options.fn(this) : options.inverse(this);
+      case '||':
+        return (v1 || v2) ? options.fn(this) : options.inverse(this);
+      default:
+        return options.inverse(this);
+    }
   });
 
   console.log('Clube dos Taberneiros | Helpers do Handlebars registrados');
@@ -648,27 +712,24 @@ Hooks.once("ready", () => {
   }
 });
 
-/* -------------------------------------------- */
-/*  Macros Pré-definidas                       */
-/* -------------------------------------------- */
-
+/**
+ * Criar macros pré-definidas
+ */
 async function _createPredefinedMacros() {
-  if (!game.user.isGM) return;
-  
-  const macros = [
-    {
-      name: "Teste de Atributo",
-      type: "script",
-      scope: "global",
-      command: `
-// Macro para teste rápido de atributo
+  try {
+    const macrosData = [
+      {
+        name: "Teste de Atributo",
+        type: "script",
+        scope: "global",
+        command: `
+// Macro: Teste de Atributo Rápido
 const actor = canvas.tokens.controlled[0]?.actor || game.user.character;
 if (!actor) {
-  ui.notifications.warn("Selecione um token ou configure um personagem!");
+  ui.notifications.warn("Nenhum personagem selecionado!");
   return;
 }
 
-// Dialog para escolher atributo
 new Dialog({
   title: "Teste de Atributo",
   content: \`
@@ -683,11 +744,7 @@ new Dialog({
         </select>
       </div>
       <div class="form-group">
-        <label>Bônus Extra:</label>
-        <input type="number" name="bonus" value="0" min="-10" max="10"/>
-      </div>
-      <div class="form-group">
-        <label>ND:</label>
+        <label>Dificuldade:</label>
         <select name="difficulty">
           <option value="5">Trivial (5)</option>
           <option value="7">Fácil (7)</option>
@@ -703,199 +760,57 @@ new Dialog({
     roll: {
       label: "Rolar",
       callback: (html) => {
-        const attr = html.find('[name="attribute"]').val();
-        const bonus = parseInt(html.find('[name="bonus"]').val()) || 0;
-        const diff = parseInt(html.find('[name="difficulty"]').val());
-        game.cdt.rollTest(actor, attr, bonus, diff);
+        const attribute = html.find('[name="attribute"]').val();
+        const difficulty = parseInt(html.find('[name="difficulty"]').val());
+        game.cdt.rollTest({ actor, attribute, difficulty });
       }
     },
     cancel: { label: "Cancelar" }
-  },
-  default: "roll"
+  }
 }).render(true);
-      `,
-      img: "icons/dice/d20black.webp"
-    },
-    {
-      name: "Iniciativa Rápida",
-      type: "script", 
-      scope: "global",
-      command: `
-// Macro para iniciativa rápida
+        `,
+        img: "icons/svg/d20-grey.svg"
+      },
+      {
+        name: "Iniciativa Rápida",
+        type: "script",
+        scope: "global",
+        command: `
+// Macro: Iniciativa Rápida para Tokens Selecionados
 const tokens = canvas.tokens.controlled;
 if (tokens.length === 0) {
-  ui.notifications.warn("Selecione tokens para rolar iniciativa!");
+  ui.notifications.warn("Nenhum token selecionado!");
   return;
 }
 
 for (let token of tokens) {
   if (token.actor) {
-    const roll = new Roll("2d6 + @acao", { acao: token.actor.system.acao?.value || 0 });
-    roll.evaluate();
-    
-    roll.toMessage({
-      speaker: ChatMessage.getSpeaker({ token }),
-      flavor: "Iniciativa"
+    const acao = token.actor.system.acao?.value || 0;
+    const roll = new Roll("2d6 + @acao", { acao });
+    roll.evaluate().then(() => {
+      ChatMessage.create({
+        content: \`\${token.name} rolou iniciativa: \${roll.total}\`,
+        speaker: ChatMessage.getSpeaker({ token })
+      });
     });
   }
 }
-      `,
-      img: "icons/svg/combat.svg"
-    },
-    {
-      name: "Descanso Rápido",
-      type: "script",
-      scope: "global", 
-      command: `
-// Macro para descanso rápido
-const actor = canvas.tokens.controlled[0]?.actor || game.user.character;
-if (!actor) {
-  ui.notifications.warn("Selecione um token ou configure um personagem!");
-  return;
-}
-
-const system = actor.system;
-const newPV = Math.min(system.pv.max, system.pv.value + Math.floor(system.pv.max / 2));
-const newPM = Math.min(system.pm.max, system.pm.value + Math.floor(system.pm.max / 2));
-
-actor.update({
-  "system.pv.value": newPV,
-  "system.pm.value": newPM
-});
-
-ui.notifications.info(\`\${actor.name} fez um descanso rápido!\`);
-ChatMessage.create({
-  speaker: ChatMessage.getSpeaker({ actor }),
-  content: \`<p><strong>Descanso Rápido</strong></p>
-           <p>PV: \${system.pv.value} → \${newPV}</p>
-           <p>PM: \${system.pm.value} → \${newPM}</p>\`
-});
-      `,
-      img: "icons/svg/sleep.svg"
-    },
-    {
-      name: "Aplicar Dano",
-      type: "script",
-      scope: "global",
-      command: `
-// Macro para aplicar dano
-const tokens = canvas.tokens.controlled;
-if (tokens.length === 0) {
-  ui.notifications.warn("Selecione tokens para aplicar dano!");
-  return;
-}
-
-new Dialog({
-  title: "Aplicar Dano",
-  content: \`
-    <form>
-      <div class="form-group">
-        <label>Dano:</label>
-        <input type="number" name="damage" value="0" min="0"/>
-      </div>
-      <div class="form-group">
-        <label>Tipo:</label>
-        <select name="type">
-          <option value="damage">Dano</option>
-          <option value="heal">Cura</option>
-        </select>
-      </div>
-    </form>
-  \`,
-  buttons: {
-    apply: {
-      label: "Aplicar",
-      callback: (html) => {
-        const damage = parseInt(html.find('[name="damage"]').val()) || 0;
-        const type = html.find('[name="type"]').val();
-        
-        for (let token of tokens) {
-          if (token.actor) {
-            const currentPV = token.actor.system.pv.value;
-            let newPV;
-            
-            if (type === "heal") {
-              newPV = Math.min(token.actor.system.pv.max, currentPV + damage);
-            } else {
-              newPV = Math.max(0, currentPV - damage);
-            }
-            
-            token.actor.update({ "system.pv.value": newPV });
-            
-            const actionText = type === "heal" ? "curou" : "sofreu";
-            ui.notifications.info(\`\${token.actor.name} \${actionText} \${damage} pontos!\`);
-          }
-        }
+        `,
+        img: "icons/svg/clockwork.svg"
       }
-    },
-    cancel: { label: "Cancelar" }
-  },
-  default: "apply"
-}).render(true);
-      `,
-      img: "icons/svg/blood.svg"
-    },
-    {
-      name: "Status do Grupo",
-      type: "script",
-      scope: "global",
-      command: `
-// Macro para mostrar status do grupo
-const actors = game.actors.filter(a => a.type === "personagem" && a.hasPlayerOwner);
+    ];
 
-if (actors.length === 0) {
-  ui.notifications.info("Nenhum personagem de jogador encontrado!");
-  return;
-}
-
-let content = "<h3>Status do Grupo</h3><table style='width:100%; border-collapse: collapse;'>";
-content += "<tr style='background:#f0f0f0;'><th>Personagem</th><th>PV</th><th>PM</th><th>Status</th></tr>";
-
-for (let actor of actors) {
-  const pv = actor.system.pv;
-  const pm = actor.system.pm;
-  const pvPercent = (pv.value / pv.max) * 100;
-  
-  let status = "Saudável";
-  let statusColor = "#28a745";
-  
-  if (pvPercent <= 25) {
-    status = "Crítico";
-    statusColor = "#dc3545";
-  } else if (pvPercent <= 50) {
-    status = "Ferido";
-    statusColor = "#ffc107";
-  }
-  
-  content += \`<tr>
-    <td style='padding:4px; border:1px solid #ddd;'>\${actor.name}</td>
-    <td style='padding:4px; border:1px solid #ddd;'>\${pv.value}/\${pv.max}</td>
-    <td style='padding:4px; border:1px solid #ddd;'>\${pm.value}/\${pm.max}</td>
-    <td style='padding:4px; border:1px solid #ddd; color:\${statusColor}; font-weight:bold;'>\${status}</td>
-  </tr>\`;
-}
-
-content += "</table>";
-
-ChatMessage.create({
-  user: game.user.id,
-  content: content
-});
-      `,
-      img: "icons/svg/status.svg"
+    for (const macroData of macrosData) {
+      const existing = game.macros.find(m => m.name === macroData.name);
+      if (!existing) {
+        await Macro.create(macroData);
+      }
     }
-  ];
 
-  // Verificar se as macros já existem
-  for (let macroData of macros) {
-    const existingMacro = game.macros.find(m => m.name === macroData.name);
-    if (!existingMacro) {
-      await Macro.create(macroData);
-      console.log(`Clube dos Taberneiros | Macro criada: ${macroData.name}`);
-    }
+    console.log('Clube dos Taberneiros | Macros pré-definidas criadas');
+  } catch (error) {
+    console.error('Clube dos Taberneiros | Erro ao criar macros:', error);
   }
-  
-  ui.notifications.info("Macros do Clube dos Taberneiros criadas! Verifique a barra de macros.");
 }
 
 /* -------------------------------------------- */
