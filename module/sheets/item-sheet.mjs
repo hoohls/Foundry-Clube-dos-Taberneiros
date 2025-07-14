@@ -3,7 +3,7 @@ export class ClubeItemSheet extends ItemSheet {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ["clube-dos-taberneiros", "sheet", "item"],
-      template: "systems/clube-dos-taberneiros/templates/item/item-sheet.html",
+      template: "systems/clube-dos-taberneiros/templates/item/item-sheet.hbs",
       width: 500,
       height: 400
     });

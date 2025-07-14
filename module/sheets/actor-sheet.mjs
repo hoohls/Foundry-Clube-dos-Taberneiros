@@ -5,7 +5,7 @@ export class TaberneiroPersonagemSheet extends ActorSheet {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ["clube-dos-taberneiros", "sheet", "actor"],
-      template: "systems/clube-dos-taberneiros/templates/actor/personagem-sheet.html",
+      template: "systems/clube-dos-taberneiros/templates/actor/personagem-sheet.hbs",
       width: 650,
       height: 650,
       tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "principal" }],

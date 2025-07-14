@@ -50,7 +50,7 @@
             <div class="atributo">
               <label>{{localize "CDT.Fisico"}}</label>
               <div class="atributo-container">
-                <input type="number" name="system.fisico.value" value="{{system.fisico.value}}" min="1" max="10"/>
+                <input type="number" name="system.fisico.value" value="{{system.fisico.value}}" min="1" max="10" data-dtype="Number"/>
                 <button type="button" class="attribute-roll cdt-tooltip" data-attribute="fisico" 
                         data-tooltip="Clique para rolar teste de Físico">
                   <i class="fas fa-dice-d6"></i>
@@ -60,7 +60,7 @@
             <div class="atributo">
               <label>{{localize "CDT.Acao"}}</label>
               <div class="atributo-container">
-                <input type="number" name="system.acao.value" value="{{system.acao.value}}" min="1" max="10"/>
+                <input type="number" name="system.acao.value" value="{{system.acao.value}}" min="1" max="10" data-dtype="Number"/>
                 <button type="button" class="attribute-roll cdt-tooltip" data-attribute="acao" 
                         data-tooltip="Clique para rolar teste de Ação">
                   <i class="fas fa-dice-d6"></i>
@@ -70,7 +70,7 @@
             <div class="atributo">
               <label>{{localize "CDT.Mental"}}</label>
               <div class="atributo-container">
-                <input type="number" name="system.mental.value" value="{{system.mental.value}}" min="1" max="10"/>
+                <input type="number" name="system.mental.value" value="{{system.mental.value}}" min="1" max="10" data-dtype="Number"/>
                 <button type="button" class="attribute-roll cdt-tooltip" data-attribute="mental" 
                         data-tooltip="Clique para rolar teste de Mental">
                   <i class="fas fa-dice-d6"></i>
@@ -80,7 +80,7 @@
             <div class="atributo">
               <label>{{localize "CDT.Social"}}</label>
               <div class="atributo-container">
-                <input type="number" name="system.social.value" value="{{system.social.value}}" min="1" max="10"/>
+                <input type="number" name="system.social.value" value="{{system.social.value}}" min="1" max="10" data-dtype="Number"/>
                 <button type="button" class="attribute-roll cdt-tooltip" data-attribute="social" 
                         data-tooltip="Clique para rolar teste de Social">
                   <i class="fas fa-dice-d6"></i>
@@ -101,9 +101,9 @@
               {{localize "CDT.PontosVida"}}
             </label>
             <div class="resource-content flexrow flex-center flex-between">
-              <input type="number" name="system.pv.value" value="{{system.pv.value}}" min="0" max="{{system.pv.max}}"/>
+              <input type="number" name="system.pv.value" value="{{system.pv.value}}" min="0" max="{{system.pv.max}}" data-dtype="Number"/>
               <span> / </span>
-              <input type="number" name="system.pv.max" value="{{system.pv.max}}" min="1"/>
+              <input type="number" name="system.pv.max" value="{{system.pv.max}}" min="1" data-dtype="Number"/>
             </div>
             <div class="resource-bar">
               <div class="resource-bar-fill {{#if (lt system.pv.value (div system.pv.max 4))}}low{{/if}}" 
@@ -116,9 +116,9 @@
           <div class="resource">
             <label class="resource-label">{{localize "CDT.PontosMagia"}}</label>
             <div class="resource-content flexrow flex-center flex-between">
-              <input type="number" name="system.pm.value" value="{{system.pm.value}}" min="0" max="{{system.pm.max}}"/>
+              <input type="number" name="system.pm.value" value="{{system.pm.value}}" min="0" max="{{system.pm.max}}" data-dtype="Number"/>
               <span> / </span>
-              <input type="number" name="system.pm.max" value="{{system.pm.max}}" min="0"/>
+              <input type="number" name="system.pm.max" value="{{system.pm.max}}" min="0" data-dtype="Number"/>
             </div>
             <div class="resource-bar">
               <div class="resource-bar-fill" style="width: {{mult (div system.pm.value system.pm.max) 100}}%"></div>
@@ -174,15 +174,15 @@
         <div class="moeda-grid">
           <div class="moeda">
             <label>{{localize "CDT.Cobre"}}</label>
-            <input type="number" name="system.recursos.moedas.cobre" value="{{system.recursos.moedas.cobre}}" min="0"/>
+            <input type="number" name="system.recursos.moedas.cobre" value="{{system.recursos.moedas.cobre}}" min="0" data-dtype="Number"/>
           </div>
           <div class="moeda">
             <label>{{localize "CDT.Prata"}}</label>
-            <input type="number" name="system.recursos.moedas.prata" value="{{system.recursos.moedas.prata}}" min="0"/>
+            <input type="number" name="system.recursos.moedas.prata" value="{{system.recursos.moedas.prata}}" min="0" data-dtype="Number"/>
           </div>
           <div class="moeda">
             <label>{{localize "CDT.Ouro"}}</label>
-            <input type="number" name="system.recursos.moedas.ouro" value="{{system.recursos.moedas.ouro}}" min="0"/>
+            <input type="number" name="system.recursos.moedas.ouro" value="{{system.recursos.moedas.ouro}}" min="0" data-dtype="Number"/>
           </div>
         </div>
       </div>
@@ -459,5 +459,4 @@
     </div>
 
   </section>
-</form>
-
+</form> 
